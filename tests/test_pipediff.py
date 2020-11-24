@@ -1,24 +1,41 @@
 #!/usr/bin/env python
 
-"""Tests for `pipediff` package."""
-
+import pandas as pd
 import pytest
 
-
-# from pipediff import pipediff
+from pipediff import PipeDiff
 
 
 @pytest.fixture
-def response():
-    """Sample pytest fixture.
+def df():
+    return pd.DataFrame(
+        {
+            "string_column": ["one", "two", "three"],
+            "float_column": [1.0, 2.0, 3.0],
+            "int_column": [1, 2, 3],
+        }
+    )
 
-    See more at: http://doc.pytest.org/en/latest/fixture.html
-    """
-    # import requests
-    # return requests.get('https://github.com/audreyr/cookiecutter-pypackage')
+
+def pipeline_function(df):
+    df = df.copy()
+    df["new_column"] = [4, 5, 6]
+    df.loc[1, "string_column"] = "four"
+    df.drop("float_column", axis=1, inplace=True)
+
+    return df
 
 
-def test_content(response):
-    """Sample pytest test function with the pytest fixture as an argument."""
-    # from bs4 import BeautifulSoup
-    # assert 'GitHub' in BeautifulSoup(response.content).title.string
+def test_compare_intersection(df):
+    df_ = df.pipe(pipeline_function)
+    diff = PipeDiff(df, df_)
+    df_result = diff.compare_intersection()
+
+    # Expected
+    df_expected = pd.DataFrame(
+        data=[["two", "four"]],
+        index=pd.Int64Index([1]),
+        columns=pd.MultiIndex.from_arrays([["string_column", "string_column"], ["self", "other"]]),
+    )
+
+    pd.testing.assert_frame_equal(df_result, df_expected)
