@@ -5,7 +5,7 @@
 import pytest
 
 
-from pipediff import pipediff
+# from pipediff import pipediff
 
 
 @pytest.fixture
