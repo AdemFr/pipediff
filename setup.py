@@ -31,7 +31,7 @@ setup(
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
     ],
-    description="Python Boilerplate contains all the boilerplate you need to create a Python package.",
+    description="A python packages to make functional pandas pipelines more transparent.",
     install_requires=requirements,
     license="MIT license",
     long_description=readme + '\n\n' + history,
