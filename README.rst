@@ -14,8 +14,6 @@ pipediff
         :alt: Documentation Status
 
 
-
-
 pipediff tries to make functional pandas pipelines more transparent.
 
 * Free software: MIT license
