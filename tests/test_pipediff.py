@@ -3,7 +3,7 @@
 import pandas as pd
 import pytest
 
-from pipediff import PipeDiff
+from pipediff import FrameDiff
 
 
 @pytest.fixture
@@ -28,7 +28,7 @@ def pipeline_function(df):
 
 def test_compare_intersection(df):
     df_ = df.pipe(pipeline_function)
-    diff = PipeDiff(df, df_)
+    diff = FrameDiff(df, df_)
     df_result = diff.compare_intersection()
 
     # Expected
