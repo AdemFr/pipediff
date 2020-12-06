@@ -7,7 +7,21 @@ from pipediff import FrameDiff
 
 
 class DiffTracker:
+    """Tracker that collects FrameDiff objects.
+
+    Usually used to track a sequence of functional transformations.
+
+    Attributes:
+        diffs (List[FrameDiff]): List of FrameDiff objects of different functional steps.
+        column_names (List[str]): Columns names to track for all dataframes.
+    """
+
     def __init__(self, column_names: List[str] = None) -> None:
+        """Initialises a DiffTracker with a couple of configurations.
+
+        Args:
+            column_names (List[str]): Columns names to track for all dataframes.
+        """
         self.diffs = {}
         self.column_names = column_names
 
@@ -19,6 +33,8 @@ class DiffTracker:
     #     column_names = self.column_names if column_names is None else column_names
 
     def track(self, func: callable) -> callable:
+        """Returns a decorator to be used for tracking the input and output of a function."""
+
         @wraps(func)
         def wrapper_decorator(*args, **kwargs) -> Any:
             df_1 = args[0]
