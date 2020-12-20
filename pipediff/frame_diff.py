@@ -25,22 +25,22 @@ class FrameDiff:
         self.columns = ColumnDiff(self.df_1, self.df_2)
 
     @property
-    def left(self) -> pd.Index:
+    def left(self) -> pd.DataFrame:
         """Slice of df_1 for all indices and columns that are exclusive to df_1."""
         return self.df_1.loc[self.index.left, self.columns.left]
 
     @property
-    def right(self) -> pd.Index:
+    def right(self) -> pd.DataFrame:
         """Slice of df_2 for all indices and columns that are exclusive to df_2."""
         return self.df_2.loc[self.index.right, self.columns.right]
 
     @property
-    def left_intersection(self) -> pd.Index:
+    def left_intersection(self) -> pd.DataFrame:
         """Slice of df_1 for all indices and columns that are present in both df_1 and df_2."""
         return self.df_1.loc[self.index.intersection, self.columns.intersection]
 
     @property
-    def right_intersection(self) -> pd.Index:
+    def right_intersection(self) -> pd.DataFrame:
         """Slice of df_2 for all indices and columns that are present in both df_1 and df_2."""
         return self.df_2.loc[self.index.intersection, self.columns.intersection]
 
