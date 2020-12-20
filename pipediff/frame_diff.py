@@ -21,8 +21,18 @@ class FrameDiff:
         """
         self.df_1 = df_1
         self.df_2 = df_2
-        self.idx = IndexDiff(self.df_1, self.df_2)
-        self.col = ColumnDiff(self.df_1, self.df_2)
+        self.index = IndexDiff(self.df_1, self.df_2)
+        self.columns = ColumnDiff(self.df_1, self.df_2)
+
+    @property
+    def left(self) -> pd.Index:
+        """The slice of indices and columns that is exclusive to df_1."""
+        return self.df_1.loc[self.index.left, self.columns.left]
+
+    @property
+    def right(self) -> pd.Index:
+        """The slice of indices and columns that is exclusive to df_2."""
+        return self.df_2.loc[self.index.right, self.columns.right]
 
     def compare_intersection(self, *args, **kwargs) -> pd.DataFrame:
         """Wrapper for pandas.DataFrame.compare.
@@ -38,6 +48,6 @@ class FrameDiff:
         Returns:
             A pandas dataframe containing the differences of the intersection of both dataframes.
         """
-        idx, cols = self.idx.intersection, self.col.intersection
+        idx, cols = self.index.intersection, self.columns.intersection
 
         return self.df_1.loc[idx, cols].compare(self.df_2.loc[idx, cols], *args, **kwargs)
