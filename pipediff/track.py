@@ -6,6 +6,29 @@ from typing import Any, List
 from pipediff import FrameDiff
 
 
+def sliced_copy(df: pd.DataFrame, column_names: List[str] = None) -> pd.DataFrame:
+    """Copies the columns of a dataframe that can be found in the given column names.
+
+    If no columns names are given, the whole data frame will be copied.
+    If no columns can be found in the data frame, an empty DataFrame is returned
+
+    Args:
+        df (pd.DataFrame): Data frame that should be copied.
+        column_names (List[str]): Columns names that should be copied.
+
+    Returns:
+        A copy of a DataFrame slice.
+    """
+    if column_names is not None:
+        df = df.filter(column_names, axis=1)  # Creates a copy
+        if len(df.columns) == 0:
+            df = pd.DataFrame()
+    else:
+        df = df.copy()
+
+    return df
+
+
 class DiffTracker:
     """Tracker that collects FrameDiff objects.
 
@@ -63,7 +86,7 @@ class DiffTracker:
                         f" Got {type(df_1)} instead."
                     )
                 else:
-                    df_1 = df_1.copy()
+                    df_1 = sliced_copy(df_1, column_names=cfg["column_names"])
 
                 out = func(*args, **kwargs)
 
@@ -76,7 +99,8 @@ class DiffTracker:
                         f" Got {type(df_2)} instead."
                     )
                 else:
-                    df_2 = df_2.copy()  # TODO only copy, if df_2 is a view of df_1 and maybe raise a warning.
+                    # TODO only copy, if df_2 is a view of df_1 and maybe raise a warning.
+                    df_2 = sliced_copy(df_2, column_names=cfg["column_names"])
 
                 self.diffs[func.__name__] = FrameDiff(df_1, df_2)
 
