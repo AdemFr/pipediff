@@ -43,7 +43,7 @@ class DiffTracker:
         cfg = dict(**self.cfg)  # Copy over the intance settings.
         for k, v in kwargs.items():
             if k not in cfg.keys():
-                raise ValueError(
+                raise TypeError(
                     f"Unknown argument '{k}'."
                     f" Please only pass arguments that the {self.__class__.__name__}.__init__() accepts!"
                 )
@@ -58,7 +58,7 @@ class DiffTracker:
 
                 df_1 = args[0]
                 if not isinstance(df_1, pd.DataFrame):
-                    raise ValueError(
+                    raise TypeError(
                         f"The first argument of '{func.__name__}' should be a pandas.DataFrame."
                         f" Got {type(df_1)} instead."
                     )
@@ -71,7 +71,7 @@ class DiffTracker:
                 # We can't use implicit unpacking like df_2, *rest = func(..) becaue DataFrames can also be unpacked.
                 df_2 = out[0] if isinstance(out, tuple) else out
                 if not isinstance(df_2, pd.DataFrame):
-                    raise ValueError(
+                    raise TypeError(
                         f"The first return value of '{func.__name__}' should be a pandas.DataFrame."
                         f" Got {type(df_2)} instead."
                     )
