@@ -10,7 +10,6 @@ def sliced_copy(df: pd.DataFrame, column_names: List[str] = None) -> pd.DataFram
     """Copies the columns of a dataframe that can be found in the given column names.
 
     If no columns names are given, the whole data frame will be copied.
-    If no columns can be found in the data frame, an empty DataFrame is returned
 
     Args:
         df (pd.DataFrame): Data frame that should be copied.
@@ -21,8 +20,6 @@ def sliced_copy(df: pd.DataFrame, column_names: List[str] = None) -> pd.DataFram
     """
     if column_names is not None:
         df = df.filter(column_names, axis=1)  # Creates a copy
-        if len(df.columns) == 0:
-            df = pd.DataFrame()
     else:
         df = df.copy()
 
