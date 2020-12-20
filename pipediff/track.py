@@ -21,6 +21,7 @@ class DiffTracker:
 
         Args:
             column_names (List[str]): Columns names to track for all dataframes.
+            deactivate (bool): If True, no tracking will be performed.
         """
         # Make a new instance of a dict with the current values for later optional overwriting.
         # Locals must be called before any other variable gets defined here.
