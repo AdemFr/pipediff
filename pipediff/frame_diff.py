@@ -26,12 +26,12 @@ class FrameDiff:
 
     @property
     def left(self) -> pd.Index:
-        """The slice of indices and columns that is exclusive to df_1."""
+        """Slice of df_1 for all indices and columns that are exclusive to df_1."""
         return self.df_1.loc[self.index.left, self.columns.left]
 
     @property
     def right(self) -> pd.Index:
-        """The slice of indices and columns that is exclusive to df_2."""
+        """Slice of df_2 for all indices and columns that are exclusive to df_2."""
         return self.df_2.loc[self.index.right, self.columns.right]
 
     @property
