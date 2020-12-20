@@ -35,7 +35,7 @@ def test_compare_intersection(df):
     df_expected = pd.DataFrame(
         data=[["two", "four"]],
         index=pd.Int64Index([1]),
-        columns=pd.MultiIndex.from_arrays([["string_column", "string_column"], ["self", "other"]]),
+        columns=pd.MultiIndex.from_arrays([["string_column"] * 2, ["self", "other"]]),
     )
 
     pd.testing.assert_frame_equal(df_result, df_expected)

@@ -38,7 +38,7 @@ class DiffTracker:
         """Returns a decorator to be used for tracking the input and output of a function.
 
         Args:
-            kwargs: Keyword arguments that should be overwritten from the instance settings.
+            kwargs: Keyword arguments that should be overwritten from the instance.__init__ args.
         """
         cfg = dict(**self.cfg)  # Copy over the intance settings.
         for k, v in kwargs.items():
@@ -57,7 +57,7 @@ class DiffTracker:
                     return func(*args, **kwargs)
 
                 df_1 = args[0]
-                if type(df_1) != pd.DataFrame:
+                if not isinstance(df_1, pd.DataFrame):
                     raise ValueError(
                         f"The first argument of '{func.__name__}' should be a pandas.DataFrame."
                         f" Got {type(df_1)} instead."
@@ -69,15 +69,17 @@ class DiffTracker:
 
                 # Unpacking the first return value in case we get a tuple
                 # We can't use implicit unpacking like df_2, *rest = func(..) becaue DataFrames can also be unpacked.
-                df_2 = out[0] if type(out) == tuple else out
-                if type(df_2) != pd.DataFrame:
+                df_2 = out[0] if isinstance(out, tuple) else out
+                if not isinstance(df_2, pd.DataFrame):
                     raise ValueError(
                         f"The first return value of '{func.__name__}' should be a pandas.DataFrame."
                         f" Got {type(df_2)} instead."
                     )
-                df_2 = df_2.copy()
+                else:
+                    df_2 = df_2.copy()  # TODO only copy, if df_2 is a view of df_1 and maybe raise a warning.
 
                 self.diffs[func.__name__] = FrameDiff(df_1, df_2)
+
                 return out
 
             return wrapper_decorator
