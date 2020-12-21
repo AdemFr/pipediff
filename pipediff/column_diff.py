@@ -57,6 +57,9 @@ class ColumnDiff:
                 as in pandas.DataFrame.aggregate
             *args: Positional arguments to pass to func.
             *kwargs: Keyword arguments to pass to func.
+
+        Returns:
+            A multi index DataFrame with one row per aggregation result for all columns and each df_1 and df_2.
         """
         # In case of a dictionary, we need to split the functions based on the existing columns in each df.
         if isinstance(agg_func, dict):
