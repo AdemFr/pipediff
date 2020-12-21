@@ -2,14 +2,6 @@ from typing import Union
 
 import pandas as pd
 
-COLUMN_AGG = {
-    "nan": lambda s: s.isna().sum(),
-    "count": lambda s: s.count(),
-    "max": lambda s: s.max(),
-    "min": lambda s: s.min(),
-    "mean": lambda s: s.mean(),
-}
-
 
 class ColumnDiff:
     """Keeps track of differences between two dataframe columns.
@@ -44,29 +36,43 @@ class ColumnDiff:
         """Gets all columns that df_1 and df_2 have in common."""
         return self.df_1.columns.intersection(self.df_2.columns)
 
-    def compare(self, column_name: str, aggregation_function: Union[str, callable]) -> pd.Series:
-        """Aggregate a column and compare the result for df_1 and df_2.
+    def agg_compare(self, agg_func: Union[callable, str, list, dict], *args, **kwargs) -> pd.Series:
+        """Aggregate and compare df_1 and df_2.
+
+        This implementation follows the pandas Aggregation API:
+        https://pandas.pydata.org/pandas-docs/stable/user_guide/basics.html#aggregation-api
+
+        All arguments are handled like in pd.DataFrame.aggregate():
+        https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.aggregate.html#pandas-dataframe-aggregate
 
         Args:
-            column_name (str): The name of the column to compare.
-            aggregation_function (Union[str, callable]): Either callable or one of these shorthands
-                "nan", "max", "min", "mean"
+            agg_func (Union[callable, str, list, dict]): Function to use for aggregating the data,
+                as in pandas.DataFrame.aggregate
+            *args: Positional arguments to pass to func.
+            *kwargs: Keyword arguments to pass to func.
         """
-        if aggregation_function in COLUMN_AGG.keys():
-            agg_func = COLUMN_AGG[aggregation_function]
-        elif callable(aggregation_function):
-            agg_func = aggregation_function
+        # In case of a dictionary, we need to split the functions based on the existing columns in each df.
+        if isinstance(agg_func, dict):
+            func_1, func_2 = {}, {}
+            for k, v in agg_func.items():
+                # We always make sure the functions are in a list, so pd.DataFrame.agg returns a DataFrame.
+                v = [v] if not isinstance(v, list) else v
+                if k in self.df_1.columns:
+                    func_1[k] = v
+                if k in self.df_2.columns:
+                    func_2[k] = v
+        # In case of any not list like func, we make it a list, so pd.DataFrame.agg returns a DataFrame.
+        elif not isinstance(agg_func, list):
+            func_1, func_2 = [agg_func], [agg_func]
         else:
-            raise ValueError(
-                f"Invalid value for 'aggregation_function'."
-                f" Either has to be a callable or one of these valid shorthands: {list(COLUMN_AGG.keys())}."
-            )
+            func_1, func_2 = agg_func, agg_func
 
-        values = {}
-        # Calculate aggregate statistics
-        if column_name in self.df_1.columns:
-            values["left"] = agg_func(self.df_1.loc[:, column_name])
-        if column_name in self.df_2.columns:
-            values["right"] = agg_func(self.df_2.loc[:, column_name])
+        agg_1 = self.df_1.agg(func_1, *args, **kwargs)
+        agg_2 = self.df_2.agg(func_2, *args, **kwargs)
 
-        return pd.Series(values)
+        # Concatenate the aggregated data frames with a pd.MultiIndex for the left and right data frame.
+        comp = pd.concat([agg_1, agg_2], axis=1, keys=["left", "right"])
+        # Put the column labels on the top level and sort them.
+        comp = comp.swaplevel(axis=1).sort_index(axis=1)
+
+        return comp
