@@ -33,3 +33,8 @@ class IndexDiff:
     def intersection(self) -> pd.Index:
         """Gets all indices that df_1 and df_2 have in common."""
         return self.df_1.index.intersection(self.df_2.index)
+
+    @property
+    def union(self) -> pd.Index:
+        """Gets all indices of df_1 and df_2."""
+        return self.df_1.index.union(self.df_2.index)
