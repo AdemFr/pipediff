@@ -6,6 +6,38 @@ from typing import Any, List
 from pipediff import FrameDiff
 
 
+def agg_func_to_list(
+    agg_func: Union[callable, str, list, dict], valid_columns: Optional[dict] = None
+) -> Union[list, dict]:
+    """Wraps an aggregation function argument into a list, so the aggregation result always has the same shape.
+
+    Args:
+        agg_func (Union[callable, str, list, dict]): Function to use for aggregating the data,
+            as in pandas.DataFrame.aggregate
+        valid_columns (Optional[dict]): If agg_func is a dictionary and valid_colums are given,
+            only aggregations with regard to these columns are returned.
+
+    Returns:
+        Aggregation function argument with all options specified as lists.
+    """
+
+    if isinstance(agg_func, dict):
+        func = {}
+        for k, v in agg_func.items():
+            # We always make sure the functions are in a list, so pd.DataFrame.agg returns a DataFrame.
+            v = [v] if not isinstance(v, list) else v
+            if valid_columns is None or k in valid_columns:
+                func[k] = v
+
+    # In case of any not list like func, we make it a list, so pd.DataFrame.agg returns a DataFrame.
+    elif not isinstance(agg_func, list):
+        func = [agg_func]
+    else:
+        func = agg_func
+
+    return func
+
+
 def sliced_copy(df: pd.DataFrame, column_names: List[str] = None) -> pd.DataFrame:
     """Copies the columns of a dataframe that can be found in the given column names.
 
