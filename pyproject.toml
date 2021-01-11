@@ -23,7 +23,7 @@ exclude = ["* __pycache__"]
 
 [tool.poetry.dependencies]
 python = "^3.6.11"
-pandas = "^1.2.0"
+pandas = "^1.0.0"
 # dev extras (see below)
 flake8 = { version = "^3.8.4", optional = true }
 flake8-annotations = { version = "^2.5.0", optional = true }
