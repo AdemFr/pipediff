@@ -1,0 +1,47 @@
+[tool.poetry]
+name = "pipediff"
+version = "0.0.1"
+description = "A python packages to make functional pandas pipelines more transparent."
+authors = ["Adem Frenk <adem.frenk@gmail.com>"]
+license = "MIT"
+readme = "README.rst"
+repository = "https://github.com/ademfr/pipediff"
+documentation = "https://pipediff.readthedocs.io/"
+classifiers=[
+    "Development Status :: 2 - Pre-Alpha",
+    "Intended Audience :: Developers",
+    "Natural Language :: English",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.6",
+    "Programming Language :: Python :: 3.7",
+]
+include = [
+    "LICENSE",
+    "HISTORY.rst",
+]
+exclude = ["* __pycache__"]
+
+[tool.poetry.dependencies]
+python = "^3.6.11"
+pandas = "^1.2.0"
+# dev extras (see below)
+flake8 = { version = "^3.8.4", optional = true }
+flake8-annotations = { version = "^2.5.0", optional = true }
+flake8-docstrings = { version = "^1.5.0", optional = true }
+black = { version = "^20.8b1", optional = true }
+bump2version = { version = "^1.0.1", optional = true }
+tox = { version = "^3.21.0", optional = true }
+# docs extras (see below)
+Sphinx = { version = "^3.4.3", optional = true }
+sphinx-rtd-theme = { version = "^0.5.1", optional = true }
+# test extras (see below)
+pytest = { version = "^6.2.1", optional = true }
+
+[tool.poetry.extras]
+dev = ["flake8", "flake8-annotations", "flake8-docstrings", "black", "bump2version", "tox"]
+docs = ["Sphinx", "sphinx-rtd-theme"]
+test = ["pytest"]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
