@@ -39,3 +39,9 @@ max_line_length = 120
 import_order_style = appnexus
 application_package_names = mxlabs_chameleon
 docstring-convention=google
+exclude =
+    .git,
+    __pycache__,
+    docs,
+    build,
+    dist
