@@ -41,3 +41,7 @@ def test_log_multiple_frames(tracker: DiffTracker) -> None:
     tracker.log_frame(pd.DataFrame())
 
     assert len(tracker.frame_logs) == 2
+
+    tracker.log_frame(pd.DataFrame(), name="my_frame")
+    with pytest.raises(KeyError):
+        tracker.log_frame(pd.DataFrame(), name="my_frame")
