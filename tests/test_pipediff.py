@@ -1,4 +1,3 @@
-from typing import KeysView
 import pandas as pd
 import pytest
 
@@ -14,14 +13,18 @@ def test_default_attributes(tracker: DiffTracker) -> None:
     assert len(tracker.frame_logs) == 0
 
 
-def test_log_empty_frame(tracker: DiffTracker) -> None:
+def test_log_empty_frame_and_access(tracker: DiffTracker) -> None:
     tracker.log_frame(pd.DataFrame())
     fl = tracker.frame_logs
 
     assert len(fl) == 1
     assert fl.get("df_0") is not None
     assert fl[0] is not None
+    assert fl[0:1] is not None
+    assert fl[0::1] is not None
     assert fl[-1] is not None
+    assert fl[-1:] is not None
+    assert fl[-1::-1] is not None
 
 
 def test_log_frame_with_name(tracker: DiffTracker) -> None:

@@ -1,5 +1,4 @@
 from collections import OrderedDict
-from itertools import islice
 from typing import Any, Union
 
 import pandas as pd
@@ -23,13 +22,15 @@ class FrameLogs(OrderedDict):
         self._assignment_counter += 1
 
     def __getitem__(self, k: Union[slice]) -> Any:
-        """Overwrites the original version, to be able to get a slice with frame_logs[1:3]."""
-        if isinstance(k, slice):
-            return FrameLogs(islice(self.items(), k.start, k.stop, k.step))
-        elif isinstance(k, int):
-            # Take the kth key and return the value
-            key = list(self.keys())[k]
-            return self[key]
+        """Overwrites the original version, to be able to get a list like slice with frame_logs[1:3]."""
+        if isinstance(k, slice) or isinstance(k, int):
+            k_slice = list(self.keys())[k]
+            if not isinstance(k_slice, list):
+                k_slice = [k_slice]
+            log_slice = FrameLogs()
+            for key in k_slice:
+                log_slice[key] = self[key]
+            return log_slice
         else:
             return super().__getitem__(k)
 
