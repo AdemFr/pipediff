@@ -26,15 +26,18 @@ def test_default_attributes(tracker: DiffTracker) -> None:
 
 
 def test_log_empty_frame_and_access(tracker: DiffTracker) -> None:
-    tracker.log_frame(pd.DataFrame())
+    result = tracker.log_frame(pd.DataFrame(), return_result=True)
     fl = tracker.frame_logs
 
     assert len(fl) == 1
-    value = fl["df_0"]
-    pd.testing.assert_frame_equal(value, pd.DataFrame())
-    assert id(value) == id(fl[0]) == id(fl[-1]), "Different access methods should yield the same value reference!"
+    pd.testing.assert_frame_equal(result, pd.DataFrame())
+    pd.testing.assert_frame_equal(result, fl["df_0"])
+    assert (
+        id(result) == id(fl["df_0"]) == id(fl[0]) == id(fl[-1])
+    ), "Different access methods should yield the same result reference!"
+
     for fl_ in (fl[0:], fl[0:1], fl[0::1], fl[-1:]):
-        assert id(value) == id(fl_["df_0"]), "Slice does not contain expected value reference!"
+        assert id(result) == id(fl_["df_0"]), "Slice does not contain expected result reference!"
 
 
 def test_log_frame_with_name(tracker: DiffTracker) -> None:
@@ -63,9 +66,10 @@ def test_log_nans() -> None:
     tracker = DiffTracker(log_nans=True)
     tracker.log_frame(test_df)
 
-    value = tracker.frame_logs[0]
-    assert all(value.columns == test_df.columns)
-    assert value.loc["nans", "nan_column"] == 2
+    result = tracker.frame_logs[0]
+    assert all(result.columns == test_df.columns)
+    assert result.loc["nans", "nan_column"] == 2
+
 
 
 # TODO

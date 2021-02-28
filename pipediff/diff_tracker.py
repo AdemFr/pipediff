@@ -46,15 +46,16 @@ class FrameLogs(OrderedDict):
 
 
 class DiffTracker:
-    def __init__(self, log_nans: bool = True) -> None:
+    def __init__(self, log_nans: bool = False) -> None:
         self.frame_logs = FrameLogs()
         self.log_nans = log_nans
 
-    def log_frame(self, df: pd.DataFrame, key: str = None) -> None:
-        if not isinstance(df, pd.DataFrame):
-            raise ValueError(f"Expected pandas.DataFrame, got {type(df)} instead!")
+    def log_frame(self, df: pd.DataFrame, key: str = None, return_result: bool = False) -> None:
         value = self._get_frame_stats(df)
         self.frame_logs.append(value=value, key=key)
+
+        if return_result:
+            return value
 
     def reset(self) -> None:
         self.frame_logs = FrameLogs()
