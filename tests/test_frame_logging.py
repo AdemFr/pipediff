@@ -110,11 +110,11 @@ def test_init_and_function_args_have_same_result(num_df: pd.DataFrame) -> None:
     pd.testing.assert_frame_equal(result_1, result_2)
 
 
-def test_column_slicing(num_df: pd.DataFrame) -> None:
-    kwargs = dict(log_nans=True, agg_func=["sum", "mean"], columns=["float_column"])
+def test_slicing(num_df: pd.DataFrame) -> None:
+    kwargs = dict(log_nans=True, agg_func=["sum", "mean"], index=[0, 2], columns=["float_column"])
 
     tracker = DiffTracker(**kwargs)
     result = tracker.log_frame(num_df, return_result=True)
 
-    expected = pd.DataFrame(data=[[0.0], [6.0], [2.0]], columns=kwargs["columns"], index=["nans", *kwargs["agg_func"]])
+    expected = pd.DataFrame(data=[[0.0], [4.0], [2.0]], columns=kwargs["columns"], index=["nans", *kwargs["agg_func"]])
     pd.testing.assert_frame_equal(result, expected)
