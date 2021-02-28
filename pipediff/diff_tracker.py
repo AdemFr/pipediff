@@ -68,9 +68,9 @@ class DiffTracker:
     def log_frame(
         self,
         df: pd.DataFrame,
+        key: str = None,
         index: list = None,
         columns: list = None,
-        key: str = None,
         log_nans: bool = None,
         agg_func: Union[callable, str, list, dict] = None,
         return_result: bool = None,
