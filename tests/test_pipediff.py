@@ -1,3 +1,4 @@
+from typing import KeysView
 import pandas as pd
 import pytest
 
@@ -10,9 +11,7 @@ def tracker() -> DiffTracker:
 
 
 def test_default_attributes(tracker: DiffTracker) -> None:
-    fl = tracker.frame_logs
-
-    assert fl == {}
+    assert len(tracker.frame_logs) == 0
 
 
 def test_log_empty_frame(tracker: DiffTracker) -> None:
@@ -21,12 +20,15 @@ def test_log_empty_frame(tracker: DiffTracker) -> None:
 
     assert len(fl) == 1
     assert fl.get("df_0") is not None
+    assert fl[0] is not None
+    assert fl[-1] is not None
 
 
 def test_log_frame_with_name(tracker: DiffTracker) -> None:
-    tracker.log_frame(pd.DataFrame(), name="my_frame")
-
+    tracker.log_frame(pd.DataFrame(), key="my_frame")
     assert tracker.frame_logs.get("my_frame") is not None
+    with pytest.raises(KeyError):
+        tracker.log_frame(pd.DataFrame(), key="my_frame")
 
 
 def test_reset_tracker_is_empty(tracker: DiffTracker) -> None:
@@ -42,6 +44,12 @@ def test_log_multiple_frames(tracker: DiffTracker) -> None:
 
     assert len(tracker.frame_logs) == 2
 
-    tracker.log_frame(pd.DataFrame(), name="my_frame")
+    tracker.log_frame(pd.DataFrame(), key="my_frame")
     with pytest.raises(KeyError):
-        tracker.log_frame(pd.DataFrame(), name="my_frame")
+        tracker.log_frame(pd.DataFrame(), key="my_frame")
+
+
+def test_log_nans_of_emtpy_frame() -> None:
+    tracker = DiffTracker(log_nans=True)
+    tracker.log_frame(pd.DataFrame())
+
