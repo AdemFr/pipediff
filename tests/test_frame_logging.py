@@ -18,13 +18,10 @@ def test_log_empty_frame_and_access(tracker: DiffTracker) -> None:
     fl = tracker.frame_logs
 
     assert len(fl) == 1
-    assert fl.get("df_0") is not None
-    assert fl[0] is not None
-    assert fl[0:1] is not None
-    assert fl[0::1] is not None
-    assert fl[-1] is not None
-    assert fl[-1:] is not None
-    assert fl[-1::-1] is not None
+    item = fl["df_0"]
+    assert id(item) == id(fl[0]) == id(fl[-1]), "Different access methods should yield the same value reference!"
+    for fl_ in (fl[0:], fl[0:1], fl[0::1], fl[-1:]):
+        assert id(item) == id(fl_["df_0"]), "Slice does not contain expected value reference!"
 
 
 def test_log_frame_with_name(tracker: DiffTracker) -> None:
@@ -37,8 +34,7 @@ def test_log_frame_with_name(tracker: DiffTracker) -> None:
 def test_reset_tracker_is_empty(tracker: DiffTracker) -> None:
     tracker.log_frame(pd.DataFrame())
     tracker.reset()
-
-    assert tracker.frame_logs == {}
+    assert len(tracker.frame_logs) == 0
 
 
 def test_log_multiple_frames(tracker: DiffTracker) -> None:
@@ -46,10 +42,6 @@ def test_log_multiple_frames(tracker: DiffTracker) -> None:
     tracker.log_frame(pd.DataFrame())
 
     assert len(tracker.frame_logs) == 2
-
-    tracker.log_frame(pd.DataFrame(), key="my_frame")
-    with pytest.raises(KeyError):
-        tracker.log_frame(pd.DataFrame(), key="my_frame")
 
 
 def test_log_nans_of_emtpy_frame() -> None:

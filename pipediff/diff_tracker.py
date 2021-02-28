@@ -23,14 +23,15 @@ class FrameLogs(OrderedDict):
 
     def __getitem__(self, k: Union[slice]) -> Any:
         """Overwrites the original version, to be able to get a list like slice with frame_logs[1:3]."""
-        if isinstance(k, slice) or isinstance(k, int):
+        if isinstance(k, slice):
             k_slice = list(self.keys())[k]
-            if not isinstance(k_slice, list):
-                k_slice = [k_slice]
             log_slice = FrameLogs()
-            for key in k_slice:
-                log_slice[key] = self[key]
+            for k_ in k_slice:
+                log_slice[k_] = super().__getitem__(k_)
             return log_slice
+        elif isinstance(k, int):
+            k_ = list(self.keys())[k]
+            return super().__getitem__(k_)
         else:
             return super().__getitem__(k)
 
