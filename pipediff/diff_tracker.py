@@ -94,7 +94,8 @@ class DiffTracker:
         func = self._agg_func_to_list(agg_func)
         return df.agg(func=func)
 
-    def _agg_func_to_list(self, agg_func: Union[callable, str, list, dict]) -> Union[list, dict]:
+    @staticmethod
+    def _agg_func_to_list(agg_func: Union[callable, str, list, dict]) -> Union[list, dict]:
         """Wraps an aggregation function argument into a list, so pd.DataFrame.agg returns a DataFrame.
 
         Args:
