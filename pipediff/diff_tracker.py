@@ -46,21 +46,40 @@ class FrameLogs(OrderedDict):
 
 
 class DiffTracker:
-    def __init__(self) -> None:
+    def __init__(
+        self,
+        log_nans: bool = False,
+        agg_func: Union[callable, str, list, dict] = None,
+        return_result: bool = False,
+    ) -> None:
+        """Init with default values for all logging and tracking."""
+        self.log_nans = log_nans
+        self.agg_func = agg_func
+        self.return_result = return_result
+
         self.frame_logs = FrameLogs()
 
     def reset(self) -> None:
+        """Reset all variables that can be set during tracking."""
         self.frame_logs = FrameLogs()
 
     def log_frame(
         self,
         df: pd.DataFrame,
         key: str = None,
-        log_nans: bool = False,
+        log_nans: bool = None,
         agg_func: Union[callable, str, list, dict] = None,
-        return_result: bool = False,
+        return_result: bool = None,
     ) -> None:
         """Append frame statistics to the frame_logs depending on the given arguments."""
+
+        if log_nans is None:
+            log_nans = self.log_nans
+        if agg_func is None:
+            agg_func = self.agg_func
+        if return_result is None:
+            return_result = self.return_result
+
         value = self._get_frame_stats(df, log_nans, agg_func)
         self.frame_logs.append(value=value, key=key)
 
