@@ -36,7 +36,7 @@ class FrameLogs(OrderedDict):
             return super().__getitem__(k)
 
     def append(self, value: Any, key: str = None) -> str:
-        """Append new entry. If key is not given a new one will be created with the prefix."""
+        """Append new entry. If key is not given a new one will be created."""
         if key is not None and key in self:
             raise KeyError(f"Key '{key}' already exists!")
         elif key is None:
@@ -51,7 +51,20 @@ class DiffTracker:
         self.log_nans = log_nans
 
     def log_frame(self, df: pd.DataFrame, key: str = None) -> None:
-        self.frame_logs.append(value=df, key=key)
+        if not isinstance(df, pd.DataFrame):
+            raise ValueError(f"Expected pandas.DataFrame, got {type(df)} instead!")
+        value = self._get_frame_stats(df)
+        self.frame_logs.append(value=value, key=key)
 
     def reset(self) -> None:
         self.frame_logs = FrameLogs()
+
+    def _get_frame_stats(self, df: pd.DataFrame) -> pd.DataFrame:
+        if len(df.columns) == 0:
+            return pd.DataFrame()
+        stats = pd.DataFrame(columns=df.columns)
+
+        if self.log_nans:
+            stats.loc["nans"] = df.isna().sum()
+
+        return stats
