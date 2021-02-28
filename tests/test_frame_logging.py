@@ -10,17 +10,6 @@ def tracker() -> DiffTracker:
     return DiffTracker()
 
 
-@pytest.fixture
-def basic_df() -> pd.DataFrame():
-    return pd.DataFrame(
-        {
-            "string_column": ["one", "two", "three"],
-            "float_column": [1.0, 2.0, 3.0],
-            "int_column": [1, 2, 3],
-        }
-    )
-
-
 def test_default_attributes(tracker: DiffTracker) -> None:
     assert len(tracker.frame_logs) == 0
 
