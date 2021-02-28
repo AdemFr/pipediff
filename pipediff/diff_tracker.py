@@ -48,14 +48,16 @@ class FrameLogs(OrderedDict):
 class DiffTracker:
     def __init__(
         self,
+        index: list = None,
+        columns: list = None,
         log_nans: bool = False,
         agg_func: Union[callable, str, list, dict] = None,
-        return_result: bool = False,
     ) -> None:
         """Init with default values for all logging and tracking."""
+        self.index = index
+        self.columns = columns
         self.log_nans = log_nans
         self.agg_func = agg_func
-        self.return_result = return_result
 
         self.frame_logs = FrameLogs()
 
@@ -66,6 +68,8 @@ class DiffTracker:
     def log_frame(
         self,
         df: pd.DataFrame,
+        index: list = None,
+        columns: list = None,
         key: str = None,
         log_nans: bool = None,
         agg_func: Union[callable, str, list, dict] = None,
@@ -73,18 +77,30 @@ class DiffTracker:
     ) -> None:
         """Append frame statistics to the frame_logs depending on the given arguments."""
 
+        if index is None:
+            index = self.index
+        if columns is None:
+            columns = self.columns
         if log_nans is None:
             log_nans = self.log_nans
         if agg_func is None:
             agg_func = self.agg_func
-        if return_result is None:
-            return_result = self.return_result
+
+        df = self._slice_df(df, index, columns)
 
         value = self._get_frame_stats(df, log_nans, agg_func)
         self.frame_logs.append(value=value, key=key)
 
         if return_result:
             return value
+
+    @staticmethod
+    def _slice_df(df: pd.DataFrame, index: list, columns: list) -> pd.DataFrame:
+        """Slicing dataframe without running into missing index errors."""
+        cols = df.columns.intersection(pd.Index(columns)) if columns is not None else df.columns
+        idx = df.index.intersection(pd.Index(index)) if index is not None else df.index
+
+        return df.loc[idx, cols]
 
     def _get_frame_stats(self, df: pd.DataFrame, log_nans: bool, agg_func: callable) -> pd.DataFrame:
         """Calculate and collect differnt frame statistics as a DataFrame format."""
@@ -99,7 +115,8 @@ class DiffTracker:
 
         return stats
 
-    def _init_empty_frame_like(self, df: pd.DataFrame) -> pd.DataFrame:
+    @staticmethod
+    def _init_empty_frame_like(df: pd.DataFrame) -> pd.DataFrame:
         """Initialised a DataFrame with the same columns and dtypes, but without rows."""
         if len(df.columns) == 0:
             df_empty = pd.DataFrame()

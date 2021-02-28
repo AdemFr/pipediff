@@ -98,13 +98,23 @@ def test_nans_and_agg(tracker: DiffTracker, num_df: pd.DataFrame) -> None:
     pd.testing.assert_frame_equal(result, expected)
 
 
-def test_init_and_function_args_have_same_result(num_df: pd.DataFrame):
-    kwargs = dict(log_nans=True, agg_func="sum", return_result=True)
+def test_init_and_function_args_have_same_result(num_df: pd.DataFrame) -> None:
+    kwargs = dict(log_nans=True, agg_func="sum", columns=["float_column"])
 
     tracker = DiffTracker()
-    result_1 = tracker.log_frame(num_df, **kwargs)
+    result_1 = tracker.log_frame(num_df, **kwargs, return_result=True)
 
     tracker = DiffTracker(**kwargs)
-    result_2 = tracker.log_frame(num_df)
+    result_2 = tracker.log_frame(num_df, return_result=True)
 
     pd.testing.assert_frame_equal(result_1, result_2)
+
+
+def test_column_slicing(num_df: pd.DataFrame) -> None:
+    kwargs = dict(log_nans=True, agg_func=["sum", "mean"], columns=["float_column"])
+
+    tracker = DiffTracker(**kwargs)
+    result = tracker.log_frame(num_df, return_result=True)
+
+    expected = pd.DataFrame(data=[[0.0], [6.0], [2.0]], columns=kwargs["columns"], index=["nans", *kwargs["agg_func"]])
+    pd.testing.assert_frame_equal(result, expected)
