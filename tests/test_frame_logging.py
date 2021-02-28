@@ -94,10 +94,3 @@ def test_agg_method_format_options_yield_same_result(tracker: DiffTracker) -> No
         # All results should be equal to the list func version of pandas.DataFrame.agg
         for res in results:
             pd.testing.assert_frame_equal(res, test_df.agg([base_func]))
-
-
-# TODO
-# log_frame produces basic result
-# Number of Nans for all columns
-# None if nothing can be calculated
-# Somehow show that the frame was empty
