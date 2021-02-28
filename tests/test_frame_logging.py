@@ -56,3 +56,9 @@ def test_log_nans_of_emtpy_frame() -> None:
     tracker = DiffTracker(log_nans=True)
     tracker.log_frame(pd.DataFrame())
 
+
+# TODO
+# log_frame produces basic result
+# Number of Nans for all columns
+# None if nothing can be calculated
+# Somehow show that the frame was empty
