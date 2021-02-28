@@ -46,26 +46,72 @@ class FrameLogs(OrderedDict):
 
 
 class DiffTracker:
-    def __init__(self, log_nans: bool = False) -> None:
+    def __init__(self) -> None:
         self.frame_logs = FrameLogs()
-        self.log_nans = log_nans
 
-    def log_frame(self, df: pd.DataFrame, key: str = None, return_result: bool = False) -> None:
-        value = self._get_frame_stats(df)
+    def reset(self) -> None:
+        self.frame_logs = FrameLogs()
+
+    def log_frame(
+        self,
+        df: pd.DataFrame,
+        key: str = None,
+        log_nans: bool = False,
+        agg_func: Union[callable, str, list, dict] = None,
+        return_result: bool = False,
+    ) -> None:
+        """Append frame statistics to the frame_logs depending on the given arguments."""
+        value = self._get_frame_stats(df, log_nans, agg_func)
         self.frame_logs.append(value=value, key=key)
 
         if return_result:
             return value
 
-    def reset(self) -> None:
-        self.frame_logs = FrameLogs()
+    def _get_frame_stats(self, df: pd.DataFrame, log_nans: bool, agg_func: callable) -> pd.DataFrame:
+        """Calculate and collect differnt frame statistics as a DataFrame format."""
+        stats = self._init_empty_frame_like(df)
 
-    def _get_frame_stats(self, df: pd.DataFrame) -> pd.DataFrame:
-        if len(df.columns) == 0:
-            return pd.DataFrame()
-        stats = pd.DataFrame(columns=df.columns)
-
-        if self.log_nans:
+        if log_nans:
             stats.loc["nans"] = df.isna().sum()
 
+        if agg_func is not None:
+            result = self._apply_agg_func(df, agg_func)
+            stats = pd.concat([stats, result])
+
         return stats
+
+    def _init_empty_frame_like(self, df: pd.DataFrame) -> pd.DataFrame:
+        """Initialised a DataFrame with the same columns and dtypes, but without rows."""
+        if len(df.columns) == 0:
+            df_empty = pd.DataFrame()
+        df_empty = pd.DataFrame(columns=df.columns)
+        df_empty = df_empty.astype(df.dtypes)  # Make sure empty columns have same type
+
+        return df_empty
+
+    def _apply_agg_func(self, df: pd.DataFrame, agg_func: callable) -> pd.DataFrame:
+        """Apply pandas.DataFrame.agg function and ensuring a DataFrame output result."""
+        func = self._agg_func_to_list(agg_func)
+        return df.agg(func=func)
+
+    def _agg_func_to_list(self, agg_func: Union[callable, str, list, dict]) -> Union[list, dict]:
+        """Wraps an aggregation function argument into a list, so pd.DataFrame.agg returns a DataFrame.
+
+        Args:
+            agg_func (Union[callable, str, list, dict]): Function to use for aggregating the data,
+                as in pandas.DataFrame.aggregate
+
+        Returns:
+            Aggregation function argument with all options specified as lists.
+        """
+        if isinstance(agg_func, dict):
+            func = {}
+            for k, v in agg_func.items():
+                # We always make sure the functions are in a list, so pd.DataFrame.agg returns a DataFrame.
+                v = [v] if not isinstance(v, list) else v
+                func[k] = v
+        # In case of any not list like func, we make it a list, so pd.DataFrame.agg returns a DataFrame.
+        else:
+            func = [agg_func] if not isinstance(agg_func, list) else agg_func
+
+        return func
