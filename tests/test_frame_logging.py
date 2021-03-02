@@ -44,11 +44,11 @@ def test_log_multiple_frames(tracker: DiffTracker) -> None:
     assert len(tracker.frame_logs) == 2
 
 
-def test_log_nans() -> None:
+def test_nans_func() -> None:
     test_df = pd.DataFrame({"nan_column": [None, 2.0, 3.0, np.nan]})
 
     tracker = DiffTracker()
-    tracker.log_frame(test_df, log_nans=True)
+    tracker.log_frame(test_df, agg_func="nans")
 
     result = tracker.frame_logs[0]
     assert all(result.columns == test_df.columns)
@@ -75,16 +75,16 @@ def test_agg_method_format_options_yield_same_result(tracker: DiffTracker, num_d
 
 
 def test_nans_and_agg(tracker: DiffTracker, num_df: pd.DataFrame) -> None:
-    agg_func = ["sum", "mean", "max"]
-    result = tracker.log_frame(num_df, log_nans=True, agg_func=agg_func, return_result=True)
+    agg_func = ["nans", "sum", "mean", "max"]
+    result = tracker.log_frame(num_df, agg_func=agg_func, return_result=True)
     expected = pd.DataFrame(
-        data=[[0.0, 0.0], [6.0, 6.0], [2.0, 2.0], [3.0, 3.0]], columns=num_df.columns, index=["nans", *agg_func]
+        data=[[0.0, 0.0], [6.0, 6.0], [2.0, 2.0], [3.0, 3.0]], columns=num_df.columns, index=agg_func
     )
     pd.testing.assert_frame_equal(result, expected)
 
 
 def test_init_and_function_args_have_same_result(num_df: pd.DataFrame) -> None:
-    kwargs = dict(log_nans=True, agg_func="sum", columns=["float_column"])
+    kwargs = dict(agg_func=["nans", "sum"], columns=["float_column"])
 
     tracker = DiffTracker()
     result_1 = tracker.log_frame(num_df, **kwargs, return_result=True)
@@ -96,10 +96,10 @@ def test_init_and_function_args_have_same_result(num_df: pd.DataFrame) -> None:
 
 
 def test_slicing(num_df: pd.DataFrame) -> None:
-    kwargs = dict(log_nans=True, agg_func=["sum", "mean"], index=[0, 2], columns=["float_column"])
+    kwargs = dict(agg_func=["nans", "sum", "mean"], index=[0, 2], columns=["float_column"])
 
     tracker = DiffTracker(**kwargs)
     result = tracker.log_frame(num_df, return_result=True)
 
-    expected = pd.DataFrame(data=[[0.0], [4.0], [2.0]], columns=kwargs["columns"], index=["nans", *kwargs["agg_func"]])
+    expected = pd.DataFrame(data=[[0.0], [4.0], [2.0]], columns=kwargs["columns"], index=kwargs["agg_func"])
     pd.testing.assert_frame_equal(result, expected)

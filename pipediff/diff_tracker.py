@@ -4,6 +4,8 @@ from typing import Any, Union
 
 import pandas as pd
 
+from pipediff.custom_agg_funcs import CustomAggFuncs
+
 
 class FrameLogs(OrderedDict):
     """An OrderedDict, which supports slicing, integer access and some custom functionality."""
@@ -51,13 +53,11 @@ class DiffTracker:
         self,
         index: list = None,
         columns: list = None,
-        log_nans: bool = False,
         agg_func: Union[callable, str, list, dict] = None,
     ) -> None:
         """Init with default values for all logging and tracking."""
         self.index = index
         self.columns = columns
-        self.log_nans = log_nans
         self.agg_func = agg_func
 
         self.frame_logs = FrameLogs()
@@ -72,7 +72,6 @@ class DiffTracker:
         key: str = None,
         index: list = None,
         columns: list = None,
-        log_nans: bool = None,
         agg_func: Union[callable, str, list, dict] = None,
         return_result: bool = None,
     ) -> None:
@@ -82,14 +81,12 @@ class DiffTracker:
             index = self.index
         if columns is None:
             columns = self.columns
-        if log_nans is None:
-            log_nans = self.log_nans
         if agg_func is None:
             agg_func = self.agg_func
 
         df = self._slice_df(df, index, columns)
 
-        value = self._get_frame_stats(df, log_nans, agg_func)
+        value = self._get_frame_stats(df, agg_func)
         self.frame_logs.append(value=value, key=key)
 
         if return_result:
@@ -138,15 +135,13 @@ class DiffTracker:
 
         return df.loc[idx, cols]
 
-    def _get_frame_stats(self, df: pd.DataFrame, log_nans: bool, agg_func: callable) -> pd.DataFrame:
+    def _get_frame_stats(self, df: pd.DataFrame, agg_func: callable) -> pd.DataFrame:
         """Calculate and collect differnt frame statistics as a DataFrame format."""
         stats = self._init_empty_frame_like(df)
 
-        if log_nans:
-            stats.loc["nans"] = df.isna().sum()
-
         if agg_func is not None:
-            result = self._apply_agg_func(df, agg_func)
+            func = self._parse_agg_func(agg_func)
+            result = df.agg(func=func)
             stats = pd.concat([stats, result])
 
         return stats
@@ -161,14 +156,11 @@ class DiffTracker:
 
         return df_empty
 
-    def _apply_agg_func(self, df: pd.DataFrame, agg_func: callable) -> pd.DataFrame:
-        """Apply pandas.DataFrame.agg function and ensuring a DataFrame output result."""
-        func = self._agg_func_to_list(agg_func)
-        return df.agg(func=func)
-
     @staticmethod
-    def _agg_func_to_list(agg_func: Union[callable, str, list, dict]) -> Union[list, dict]:
+    def _parse_agg_func(agg_func: Union[callable, str, list, dict]) -> Union[list, dict]:
         """Wraps an aggregation function argument into a list, so pd.DataFrame.agg returns a DataFrame.
+        If any member of agg_func is a valid CustomAggFuncs key, it will be overwritten by the callable
+        custom aggregation function.
 
         Args:
             agg_func (Union[callable, str, list, dict]): Function to use for aggregating the data,
@@ -177,14 +169,25 @@ class DiffTracker:
         Returns:
             Aggregation function argument with all options specified as lists.
         """
-        if isinstance(agg_func, dict):
-            func = {}
-            for k, v in agg_func.items():
-                # We always make sure the functions are in a list, so pd.DataFrame.agg returns a DataFrame.
-                v = [v] if not isinstance(v, list) else v
-                func[k] = v
-        # In case of any not list like func, we make it a list, so pd.DataFrame.agg returns a DataFrame.
-        else:
-            func = [agg_func] if not isinstance(agg_func, list) else agg_func
 
-        return func
+        def _listify_and_parse_custom_agg_function(f: Union[callable, str, list]) -> list:
+            """In case of any not list like f, we make it a list, so pd.DataFrame.agg returns a DataFrame."""
+            f_list = [f] if not isinstance(f, list) else f
+            f_list = f_list.copy()
+
+            for i, func in enumerate(f_list):
+                try:
+                    f_list[i] = CustomAggFuncs[func].value  # Overwrite value if func string exists
+                    f_list[i].__name__ = func  # This enforces the same DataFrame.agg result name
+                except KeyError:
+                    pass
+            return f_list
+
+        if isinstance(agg_func, dict):
+            _agg_func = {}
+            for col, col_func in agg_func.items():
+                _agg_func[col] = _listify_and_parse_custom_agg_function(col_func)
+        else:
+            _agg_func = _listify_and_parse_custom_agg_function(agg_func)
+
+        return _agg_func
