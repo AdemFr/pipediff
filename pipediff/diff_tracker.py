@@ -51,12 +51,12 @@ class FrameLogs(OrderedDict):
 class DiffTracker:
     def __init__(
         self,
-        index: list = None,
+        indices: list = None,
         columns: list = None,
         agg_func: Union[callable, str, list, dict] = None,
     ) -> None:
         """Init with default values for all logging and tracking."""
-        self.index = index
+        self.indices = indices
         self.columns = columns
         self.agg_func = agg_func
 
@@ -70,21 +70,21 @@ class DiffTracker:
         self,
         df: pd.DataFrame,
         key: str = None,
-        index: list = None,
+        indices: list = None,
         columns: list = None,
         agg_func: Union[callable, str, list, dict] = None,
         return_result: bool = None,
     ) -> None:
         """Append frame statistics to the frame_logs depending on the given arguments."""
 
-        if index is None:
-            index = self.index
+        if indices is None:
+            indices = self.indices
         if columns is None:
             columns = self.columns
         if agg_func is None:
             agg_func = self.agg_func
 
-        df = self._slice_df(df, index, columns)
+        df = self._slice_df(df, indices, columns)
 
         value = self._get_frame_stats(df, agg_func)
         self.frame_logs.append(value=value, key=key)
@@ -128,10 +128,10 @@ class DiffTracker:
         return track_decorator
 
     @staticmethod
-    def _slice_df(df: pd.DataFrame, index: list, columns: list) -> pd.DataFrame:
+    def _slice_df(df: pd.DataFrame, indices: list, columns: list) -> pd.DataFrame:
         """Slicing dataframe without running into missing index errors."""
         cols = df.columns.intersection(pd.Index(columns)) if columns is not None else df.columns
-        idx = df.index.intersection(pd.Index(index)) if index is not None else df.index
+        idx = df.index.intersection(pd.Index(indices)) if indices is not None else df.index
 
         return df.loc[idx, cols]
 

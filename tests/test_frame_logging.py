@@ -105,7 +105,7 @@ def test_init_and_function_args_have_same_result(df_num: pd.DataFrame) -> None:
 
 
 def test_slicing(df_num: pd.DataFrame) -> None:
-    kwargs = dict(agg_func=["nans", "sum", "mean"], index=[0, 2], columns=["float"])
+    kwargs = dict(agg_func=["nans", "sum", "mean"], indices=[0, 2], columns=["float"])
 
     tracker = DiffTracker(**kwargs)
     result = tracker.log_frame(df_num, return_result=True)
