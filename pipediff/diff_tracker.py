@@ -29,12 +29,12 @@ class FrameLogs(OrderedDict):
         if isinstance(k, slice):
             k_slice = list(self.keys())[k]
             log_slice = FrameLogs()
-            for k_ in k_slice:
-                log_slice[k_] = super().__getitem__(k_)
+            for _k in k_slice:
+                log_slice[_k] = super().__getitem__(_k)
             return log_slice
         elif isinstance(k, int):
-            k_ = list(self.keys())[k]
-            return super().__getitem__(k_)
+            _k = list(self.keys())[k]
+            return super().__getitem__(_k)
         else:
             return super().__getitem__(k)
 
@@ -54,11 +54,13 @@ class DiffTracker:
         indices: list = None,
         columns: list = None,
         agg_func: Union[callable, str, list, dict] = None,
+        axis: int = 0,
     ) -> None:
         """Init with default values for all logging and tracking."""
         self.indices = indices
         self.columns = columns
         self.agg_func = agg_func
+        self.axis = axis
 
         self.frame_logs = FrameLogs()
 
@@ -73,6 +75,7 @@ class DiffTracker:
         indices: list = None,
         columns: list = None,
         agg_func: Union[callable, str, list, dict] = None,
+        axis: int = 0,
         return_result: bool = None,
     ) -> None:
         """Append frame statistics to the frame_logs depending on the given arguments."""
@@ -83,10 +86,12 @@ class DiffTracker:
             columns = self.columns
         if agg_func is None:
             agg_func = self.agg_func
+        if axis is None:
+            axis = self.axis
 
         df = self._slice_df(df, indices, columns)
 
-        value = self._get_frame_stats(df, agg_func)
+        value = self._get_frame_stats(df, agg_func, axis)
         self.frame_logs.append(value=value, key=key)
 
         if return_result:
@@ -135,14 +140,14 @@ class DiffTracker:
 
         return df.loc[idx, cols]
 
-    def _get_frame_stats(self, df: pd.DataFrame, agg_func: callable) -> pd.DataFrame:
+    def _get_frame_stats(self, df: pd.DataFrame, agg_func: callable, axis: int) -> pd.DataFrame:
         """Calculate and collect differnt frame statistics as a DataFrame format."""
         # If we don't do anything, we would expect an empty DataFrame with the same dtypes
         stats = self._init_empty_frame_like(df)
 
         if agg_func is not None:
             func = self._parse_agg_func(agg_func)
-            result = df.agg(func=func)
+            result = df.agg(func=func, axis=axis)
 
             # Reinitilize if the resutls were empty, so that the data types are as close
             # to what one would expect from the aggregation function.
