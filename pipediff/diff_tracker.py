@@ -137,11 +137,19 @@ class DiffTracker:
 
     def _get_frame_stats(self, df: pd.DataFrame, agg_func: callable) -> pd.DataFrame:
         """Calculate and collect differnt frame statistics as a DataFrame format."""
+        # If we don't do anything, we would expect an empty DataFrame with the same dtypes
         stats = self._init_empty_frame_like(df)
 
         if agg_func is not None:
             func = self._parse_agg_func(agg_func)
             result = df.agg(func=func)
+
+            # Reinitilize if the resutls were empty, so that the data types are as close
+            # to what one would expect from the aggregation function.
+            # If there are stats, we need to try to concatenate anyways, and the dtypes can not
+            # unambiguously determined. This lets pandas handle the type conversion for concat.
+            if len(stats) == 0:
+                stats = self._init_empty_frame_like(result)
             stats = pd.concat([stats, result])
 
         return stats
