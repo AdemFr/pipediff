@@ -7,7 +7,7 @@ import pandas as pd
 from pipediff.custom_agg_funcs import CustomAggFuncs
 
 
-class FrameLogs(OrderedDict):
+class FrameLogCollection(OrderedDict):
     """An OrderedDict, which supports slicing, integer access and some custom functionality."""
 
     def __init__(self, *args, **kwargs) -> None:
@@ -28,7 +28,7 @@ class FrameLogs(OrderedDict):
         """Overwrites the original version, to be able to get a list like slice with frame_logs[1:3]."""
         if isinstance(k, slice):
             k_slice = list(self.keys())[k]
-            log_slice = FrameLogs()
+            log_slice = FrameLogCollection()
             for _k in k_slice:
                 log_slice[_k] = super().__getitem__(_k)
             return log_slice
@@ -62,11 +62,11 @@ class DiffTracker:
         self.agg_func = agg_func
         self.axis = axis
 
-        self.frame_logs = FrameLogs()
+        self.logs = FrameLogCollection()
 
     def reset(self) -> None:
         """Reset all variables that can be set during tracking."""
-        self.frame_logs = FrameLogs()
+        self.logs = FrameLogCollection()
 
     def log_frame(
         self,
@@ -92,7 +92,7 @@ class DiffTracker:
         df = self._slice_df(df, indices, columns)
 
         value = self._get_frame_stats(df, agg_func, axis)
-        self.frame_logs.append(value=value, key=key)
+        self.logs.append(value=value, key=key)
 
         if return_result:
             return value

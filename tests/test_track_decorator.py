@@ -14,7 +14,7 @@ def test_basic_tracking_decorator(tracker: DiffTracker, df_all_types: pd.DataFra
 
     pd.testing.assert_frame_equal(res_1, res_2)
 
-    assert len(tracker.frame_logs) == 2
+    assert len(tracker.logs) == 2
 
 
 def test_decorator_exceptions(tracker: DiffTracker, df_all_types: pd.DataFrame) -> None:

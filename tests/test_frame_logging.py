@@ -6,12 +6,12 @@ from pipediff import DiffTracker
 
 
 def test_default_attributes(tracker: DiffTracker) -> None:
-    assert len(tracker.frame_logs) == 0
+    assert len(tracker.logs) == 0
 
 
 def test_log_empty_frame_and_access(tracker: DiffTracker) -> None:
     result = tracker.log_frame(pd.DataFrame(), return_result=True)
-    fl = tracker.frame_logs
+    fl = tracker.logs
 
     assert len(fl) == 1
     pd.testing.assert_frame_equal(result, pd.DataFrame())
@@ -32,7 +32,7 @@ def test_log_frame_same_dtypes_for_empty_stats(tracker: DiffTracker, df_all_type
 
 def test_log_frame_with_name(tracker: DiffTracker) -> None:
     tracker.log_frame(pd.DataFrame(), key="my_frame")
-    assert tracker.frame_logs.get("my_frame") is not None
+    assert tracker.logs.get("my_frame") is not None
     with pytest.raises(KeyError):
         tracker.log_frame(pd.DataFrame(), key="my_frame")
 
@@ -40,14 +40,14 @@ def test_log_frame_with_name(tracker: DiffTracker) -> None:
 def test_reset_tracker_is_empty(tracker: DiffTracker) -> None:
     tracker.log_frame(pd.DataFrame())
     tracker.reset()
-    assert len(tracker.frame_logs) == 0
+    assert len(tracker.logs) == 0
 
 
 def test_log_multiple_frames(tracker: DiffTracker) -> None:
     tracker.log_frame(pd.DataFrame())
     tracker.log_frame(pd.DataFrame())
 
-    assert len(tracker.frame_logs) == 2
+    assert len(tracker.logs) == 2
 
 
 def test_nans_func() -> None:
@@ -56,7 +56,7 @@ def test_nans_func() -> None:
     tracker = DiffTracker()
     tracker.log_frame(df_test, agg_func="nans")
 
-    result = tracker.frame_logs[0]
+    result = tracker.logs[0]
     assert all(result.columns == df_test.columns)
     assert result.loc["nans", "nan_column"] == 2
 
@@ -120,3 +120,7 @@ def test_slicing(df_num: pd.DataFrame) -> None:
 
     expected = pd.DataFrame(data=[[0.0], [4.0], [2.0]], columns=kwargs["columns"], index=kwargs["agg_func"])
     pd.testing.assert_frame_equal(result, expected)
+
+
+# Access frame logs for index and columns differently with value.agg_indices and value.agg_columns
+# Slice copy (maybe with warnings for too large copy operations)
