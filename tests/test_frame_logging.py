@@ -75,10 +75,10 @@ def test_agg_method_format_options_yield_same_result(tracker: DiffTracker, num_d
 
 
 def test_nans_and_agg(tracker: DiffTracker, num_df: pd.DataFrame) -> None:
-    agg_func = ["nans", "sum", "mean", "max"]
+    agg_func = ["nans", "notnans", "sum", "mean", "max"]
     result = tracker.log_frame(num_df, agg_func=agg_func, return_result=True)
     expected = pd.DataFrame(
-        data=[[0.0, 0.0], [6.0, 6.0], [2.0, 2.0], [3.0, 3.0]], columns=num_df.columns, index=agg_func
+        data=[[0.0, 0.0], [3.0, 3.0], [6.0, 6.0], [2.0, 2.0], [3.0, 3.0]], columns=num_df.columns, index=agg_func
     )
     pd.testing.assert_frame_equal(result, expected)
 
