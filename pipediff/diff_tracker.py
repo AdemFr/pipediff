@@ -5,6 +5,33 @@ from typing import Any, Union
 import pandas as pd
 
 from pipediff.custom_agg_funcs import CustomAggFuncs
+from dataclasses import dataclass
+
+
+@dataclass
+class FrameLog:
+
+    agg: pd.DataFrame = None
+    axis: int = None
+    copies: pd.DataFrame = None
+
+    def __eq__(self, o: object) -> bool:
+        """Checks classical equivalence for all non DataFrame object, and asserts that all DataFrames
+        are exactly the same.
+        """
+        if not isinstance(o, FrameLog):
+            return False
+        else:
+            for attr in ("agg", "axis", "copies"):
+                a1, a2 = getattr(self, attr), getattr(o, attr)
+                if isinstance(a1, pd.DataFrame) and isinstance(a2, pd.DataFrame):
+                    try:
+                        pd.testing.assert_frame_equal(a1, a2)
+                    except AssertionError:
+                        return False
+                elif a1 != a2:
+                    return False
+        return True
 
 
 class FrameLogCollection(OrderedDict):
@@ -38,7 +65,7 @@ class FrameLogCollection(OrderedDict):
         else:
             return super().__getitem__(k)
 
-    def append(self, value: Any, key: str = None) -> str:
+    def append(self, value: FrameLog, key: str = None) -> str:
         """Append new entry. If key is not given a new one will be created."""
         if key is not None and key in self:
             raise KeyError(f"Key '{key}' already exists!")
@@ -89,13 +116,17 @@ class DiffTracker:
         if axis is None:
             axis = self.axis
 
+        frame_log = FrameLog()
+
         df = self._slice_df(df, indices, columns)
 
-        value = self._get_frame_stats(df, agg_func, axis)
-        self.logs.append(value=value, key=key)
+        if agg_func is not None:
+            frame_log.agg = self._get_agg(df, agg_func, axis)
+            frame_log.axis = axis
 
+        self.logs.append(value=frame_log, key=key)
         if return_result:
-            return value
+            return frame_log
 
     def track(self) -> callable:
         """Returns a decorator to be used for tracking the input and output of a function."""
@@ -140,34 +171,12 @@ class DiffTracker:
 
         return df.loc[idx, cols]
 
-    def _get_frame_stats(self, df: pd.DataFrame, agg_func: callable, axis: int) -> pd.DataFrame:
-        """Calculate and collect differnt frame statistics as a DataFrame format."""
-        # If we don't do anything, we would expect an empty DataFrame with the same dtypes
-        stats = self._init_empty_frame_like(df)
+    def _get_agg(self, df: pd.DataFrame, agg_func: callable, axis: int) -> pd.DataFrame:
+        """Calculate aggregation statistics for the dataframe."""
+        func = self._parse_agg_func(agg_func)
+        df_agg = df.agg(func=func, axis=axis)
 
-        if agg_func is not None:
-            func = self._parse_agg_func(agg_func)
-            result = df.agg(func=func, axis=axis)
-
-            # Reinitilize if the resutls were empty, so that the data types are as close
-            # to what one would expect from the aggregation function.
-            # If there are stats, we need to try to concatenate anyways, and the dtypes can not
-            # unambiguously determined. This lets pandas handle the type conversion for concat.
-            if len(stats) == 0:
-                stats = self._init_empty_frame_like(result)
-            stats = pd.concat([stats, result])
-
-        return stats
-
-    @staticmethod
-    def _init_empty_frame_like(df: pd.DataFrame) -> pd.DataFrame:
-        """Initialised a DataFrame with the same columns and dtypes, but without rows."""
-        if len(df.columns) == 0:
-            df_empty = pd.DataFrame()
-        df_empty = pd.DataFrame(columns=df.columns)
-        df_empty = df_empty.astype(df.dtypes)  # Make sure empty columns have same type
-
-        return df_empty
+        return df_agg
 
     @staticmethod
     def _parse_agg_func(agg_func: Union[callable, str, list, dict]) -> Union[list, dict]:

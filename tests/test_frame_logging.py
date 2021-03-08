@@ -3,38 +3,16 @@ import pandas as pd
 import pytest
 
 from pipediff import DiffTracker
+from pipediff.diff_tracker import FrameLog
 
 
 def test_default_attributes(tracker: DiffTracker) -> None:
     assert len(tracker.logs) == 0
 
 
-def test_log_empty_frame_and_access(tracker: DiffTracker) -> None:
+def test_log_empty_frame(tracker: DiffTracker) -> None:
     result = tracker.log_frame(pd.DataFrame(), return_result=True)
-    fl = tracker.logs
-
-    assert len(fl) == 1
-    pd.testing.assert_frame_equal(result, pd.DataFrame())
-    pd.testing.assert_frame_equal(result, fl["df_0"])
-    assert (
-        id(result) == id(fl["df_0"]) == id(fl[0]) == id(fl[-1])
-    ), "Different access methods should yield the same result reference!"
-
-    for fl_ in (fl[0:], fl[0:1], fl[0::1], fl[-1:]):
-        assert id(result) == id(fl_["df_0"]), "Slice does not contain expected result reference!"
-
-
-def test_log_frame_same_dtypes_for_empty_stats(tracker: DiffTracker, df_all_types: pd.DataFrame) -> None:
-    result = tracker.log_frame(df_all_types, return_result=True)
-
-    pd.testing.assert_series_equal(df_all_types.dtypes, result.dtypes)
-
-
-def test_log_frame_with_name(tracker: DiffTracker) -> None:
-    tracker.log_frame(pd.DataFrame(), key="my_frame")
-    assert tracker.logs.get("my_frame") is not None
-    with pytest.raises(KeyError):
-        tracker.log_frame(pd.DataFrame(), key="my_frame")
+    assert result == FrameLog()
 
 
 def test_reset_tracker_is_empty(tracker: DiffTracker) -> None:
@@ -50,15 +28,37 @@ def test_log_multiple_frames(tracker: DiffTracker) -> None:
     assert len(tracker.logs) == 2
 
 
+def test_frame_log_access(tracker: DiffTracker, df_num: pd.DataFrame) -> None:
+    result = tracker.log_frame(df_num, agg_func="sum", return_result=True)
+    fl = tracker.logs
+
+    assert len(fl) == 1
+
+    # Same aggregation DataFrame values and ids
+    pd.testing.assert_frame_equal(result.agg, fl["df_0"].agg)
+    assert (
+        id(result.agg) == id(fl["df_0"].agg) == id(fl[0].agg) == id(fl[-1].agg)
+    ), "Different access methods should yield the same result reference!"
+
+    for fl_ in (fl[0:], fl[0:1], fl[0::1], fl[-1:]):
+        assert id(result.agg) == id(fl_["df_0"].agg), "Slice does not contain expected result reference!"
+
+
+def test_log_frame_with_name(tracker: DiffTracker) -> None:
+    tracker.log_frame(pd.DataFrame(), key="my_frame")
+    assert tracker.logs.get("my_frame") is not None
+    with pytest.raises(KeyError):
+        tracker.log_frame(pd.DataFrame(), key="my_frame")
+
+
 def test_nans_func() -> None:
     df_test = pd.DataFrame({"nan_column": [None, 2.0, 3.0, np.nan]})
 
     tracker = DiffTracker()
-    tracker.log_frame(df_test, agg_func="nans")
+    result = tracker.log_frame(df_test, agg_func="nans", return_result=True)
 
-    result = tracker.logs[0]
-    assert all(result.columns == df_test.columns)
-    assert result.loc["nans", "nan_column"] == 2
+    assert all(result.agg.columns == df_test.columns)
+    assert result.agg.loc["nans", "nan_column"] == 2
 
 
 def test_agg_method_format_options_yield_same_result(tracker: DiffTracker, df_num: pd.DataFrame) -> None:
@@ -74,7 +74,7 @@ def test_agg_method_format_options_yield_same_result(tracker: DiffTracker, df_nu
             {c: [base_func] for c in df_num.columns},
         ):
             result = tracker.log_frame(df_num, return_result=True, agg_func=func)
-            results.append(result)
+            results.append(result.agg)
 
         # All results should be equal to the list func version of pandas.DataFrame.agg
         for res in results:
@@ -89,7 +89,7 @@ def test_nans_and_agg_for_both_axis(tracker: DiffTracker, df_num: pd.DataFrame) 
         columns=df_num.columns,
         index=agg_func,
     )
-    pd.testing.assert_frame_equal(result, expected)
+    pd.testing.assert_frame_equal(result.agg, expected)
 
     result = tracker.log_frame(df_num, agg_func=agg_func, axis=1, return_result=True)
     expected = pd.DataFrame(
@@ -97,7 +97,7 @@ def test_nans_and_agg_for_both_axis(tracker: DiffTracker, df_num: pd.DataFrame) 
         columns=agg_func,
         index=df_num.index,
     )
-    pd.testing.assert_frame_equal(result, expected)
+    pd.testing.assert_frame_equal(result.agg, expected)
 
 
 def test_init_and_function_args_have_same_result(df_num: pd.DataFrame) -> None:
@@ -109,7 +109,8 @@ def test_init_and_function_args_have_same_result(df_num: pd.DataFrame) -> None:
     tracker = DiffTracker(**kwargs)
     result_2 = tracker.log_frame(df_num, return_result=True)
 
-    pd.testing.assert_frame_equal(result_1, result_2)
+    assert result_1 == result_2
+    pd.testing.assert_frame_equal(result_1.agg, result_2.agg)
 
 
 def test_slicing(df_num: pd.DataFrame) -> None:
@@ -119,7 +120,7 @@ def test_slicing(df_num: pd.DataFrame) -> None:
     result = tracker.log_frame(df_num, return_result=True)
 
     expected = pd.DataFrame(data=[[0.0], [4.0], [2.0]], columns=kwargs["columns"], index=kwargs["agg_func"])
-    pd.testing.assert_frame_equal(result, expected)
+    pd.testing.assert_frame_equal(result.agg, expected)
 
 
 # Access frame logs for index and columns differently with value.agg_indices and value.agg_columns
