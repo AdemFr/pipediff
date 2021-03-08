@@ -13,6 +13,7 @@ class FrameLog:
 
     agg: pd.DataFrame = None
     axis: int = None
+    dtypes: dict = None
     copy: pd.DataFrame = None
 
     def __eq__(self, o: object) -> bool:
@@ -82,6 +83,7 @@ class DiffTracker:
         columns: list = None,
         agg_func: Union[callable, str, list, dict] = None,
         axis: int = 0,
+        dtypes: bool = None,
         copy: bool = None,
     ) -> None:
         """Init with default values for all logging and tracking."""
@@ -89,6 +91,7 @@ class DiffTracker:
         self.columns = columns
         self.agg_func = agg_func
         self.axis = axis
+        self.dtypes = dtypes
         self.copy = copy
 
         self.logs = FrameLogCollection()
@@ -105,6 +108,7 @@ class DiffTracker:
         columns: list = None,
         agg_func: Union[callable, str, list, dict] = None,
         axis: int = 0,
+        dtypes: bool = None,
         copy: bool = None,
         return_result: bool = None,
     ) -> None:
@@ -118,6 +122,8 @@ class DiffTracker:
             agg_func = self.agg_func
         if axis is None:
             axis = self.axis
+        if dtypes is None:
+            dtypes = self.dtypes
         if copy is None:
             copy = self.copy
 
@@ -128,6 +134,8 @@ class DiffTracker:
         if agg_func is not None:
             frame_log.agg = self._get_agg(df, agg_func, axis)
             frame_log.axis = axis
+        if dtypes:
+            frame_log.dtypes = dict(df.dtypes)
         if copy:
             frame_log.copy = df.copy()
 
