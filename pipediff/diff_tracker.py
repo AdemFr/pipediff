@@ -160,7 +160,8 @@ class DiffTracker:
             df = self._slice_df(df, indices, columns)
 
         if agg_func is not None:
-            frame_log.agg = self._get_agg(df, agg_func, axis)
+            func_list = self._parse_agg_func(agg_func)
+            frame_log.agg = df.agg(func=func_list, axis=axis)
             frame_log.axis = axis
         if dtypes:
             frame_log.dtypes = dict(df.dtypes)
@@ -182,13 +183,6 @@ class DiffTracker:
         idx = df.index.intersection(pd.Index(indices)) if indices is not None else df.index
 
         return df.loc[idx, cols]
-
-    def _get_agg(self, df: pd.DataFrame, agg_func: callable, axis: int) -> pd.DataFrame:
-        """Calculate aggregation statistics for the dataframe."""
-        func = self._parse_agg_func(agg_func)
-        df_agg = df.agg(func=func, axis=axis)
-
-        return df_agg
 
     @staticmethod
     def _parse_agg_func(agg_func: Union[callable, str, list, dict]) -> Union[list, dict]:
