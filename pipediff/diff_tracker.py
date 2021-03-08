@@ -128,41 +128,6 @@ class DiffTracker:
         if return_result:
             return frame_log
 
-    def track(self) -> callable:
-        """Returns a decorator to be used for tracking the input and output of a function."""
-
-        def track_decorator(func: callable) -> callable:
-            @wraps(func)
-            def wrapper_decorator(*args, **kwargs) -> Any:
-
-                df_1 = [*args, *kwargs.values()][0]  # args could be empty, so collecting all values.
-                if not isinstance(df_1, pd.DataFrame):
-                    raise TypeError(
-                        f"The first argument of '{func.__name__}' should be a pandas.DataFrame."
-                        f" Got {type(df_1)} instead."
-                    )
-                else:
-                    self.log_frame(df_1)
-
-                out = func(*args, **kwargs)
-
-                # Unpacking the first return value in case we get a tuple
-                # We can't use implicit unpacking like df_2, *rest = func(..) becaue DataFrames can also be unpacked.
-                df_2 = out[0] if isinstance(out, tuple) else out
-                if not isinstance(df_2, pd.DataFrame):
-                    raise TypeError(
-                        f"The first return value of '{func.__name__}' should be a pandas.DataFrame."
-                        f" Got {type(df_2)} instead."
-                    )
-                else:
-                    self.log_frame(df_2)
-
-                return out
-
-            return wrapper_decorator
-
-        return track_decorator
-
     @staticmethod
     def _slice_df(df: pd.DataFrame, indices: list, columns: list) -> pd.DataFrame:
         """Slicing dataframe without running into missing index errors."""
@@ -213,3 +178,38 @@ class DiffTracker:
             _agg_func = _listify_and_parse_custom_agg_function(agg_func)
 
         return _agg_func
+
+    def track(self) -> callable:
+        """Returns a decorator to be used for tracking the input and output of a function."""
+
+        def track_decorator(func: callable) -> callable:
+            @wraps(func)
+            def wrapper_decorator(*args, **kwargs) -> Any:
+
+                df_1 = [*args, *kwargs.values()][0]  # args could be empty, so collecting all values.
+                if not isinstance(df_1, pd.DataFrame):
+                    raise TypeError(
+                        f"The first argument of '{func.__name__}' should be a pandas.DataFrame."
+                        f" Got {type(df_1)} instead."
+                    )
+                else:
+                    self.log_frame(df_1)
+
+                out = func(*args, **kwargs)
+
+                # Unpacking the first return value in case we get a tuple
+                # We can't use implicit unpacking like df_2, *rest = func(..) becaue DataFrames can also be unpacked.
+                df_2 = out[0] if isinstance(out, tuple) else out
+                if not isinstance(df_2, pd.DataFrame):
+                    raise TypeError(
+                        f"The first return value of '{func.__name__}' should be a pandas.DataFrame."
+                        f" Got {type(df_2)} instead."
+                    )
+                else:
+                    self.log_frame(df_2)
+
+                return out
+
+            return wrapper_decorator
+
+        return track_decorator
