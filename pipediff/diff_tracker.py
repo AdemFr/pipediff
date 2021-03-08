@@ -5,16 +5,17 @@ from typing import Any, Union
 import pandas as pd
 
 from pipediff.custom_agg_funcs import CustomAggFuncs
-from dataclasses import dataclass
 
 
-@dataclass
 class FrameLog:
-
-    agg: pd.DataFrame = None
-    axis: int = None
-    dtypes: dict = None
-    copy: pd.DataFrame = None
+    def __init__(
+        self, agg: pd.DataFrame = None, axis: int = None, dtypes: dict = None, copy: pd.DataFrame = None
+    ) -> None:
+        """Init empty FrameLog"""
+        self.agg = agg
+        self.axis = axis
+        self.dtypes = dtypes
+        self.copy = copy
 
     def __eq__(self, o: object) -> bool:
         """Checks classical equivalence for all non DataFrame object, and asserts that all DataFrames
