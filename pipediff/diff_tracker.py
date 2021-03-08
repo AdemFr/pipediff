@@ -13,7 +13,7 @@ class FrameLog:
 
     agg: pd.DataFrame = None
     axis: int = None
-    copies: pd.DataFrame = None
+    copy: pd.DataFrame = None
 
     def __eq__(self, o: object) -> bool:
         """Checks classical equivalence for all non DataFrame object, and asserts that all DataFrames
@@ -22,7 +22,7 @@ class FrameLog:
         if not isinstance(o, FrameLog):
             return False
         else:
-            for attr in ("agg", "axis", "copies"):
+            for attr in ("agg", "axis", "copy"):
                 a1, a2 = getattr(self, attr), getattr(o, attr)
                 if isinstance(a1, pd.DataFrame) and isinstance(a2, pd.DataFrame):
                     try:
@@ -82,12 +82,14 @@ class DiffTracker:
         columns: list = None,
         agg_func: Union[callable, str, list, dict] = None,
         axis: int = 0,
+        copy: bool = None,
     ) -> None:
         """Init with default values for all logging and tracking."""
         self.indices = indices
         self.columns = columns
         self.agg_func = agg_func
         self.axis = axis
+        self.copy = copy
 
         self.logs = FrameLogCollection()
 
@@ -103,6 +105,7 @@ class DiffTracker:
         columns: list = None,
         agg_func: Union[callable, str, list, dict] = None,
         axis: int = 0,
+        copy: bool = None,
         return_result: bool = None,
     ) -> None:
         """Append frame statistics to the frame_logs depending on the given arguments."""
@@ -115,6 +118,8 @@ class DiffTracker:
             agg_func = self.agg_func
         if axis is None:
             axis = self.axis
+        if copy is None:
+            copy = self.copy
 
         frame_log = FrameLog()
 
@@ -123,6 +128,8 @@ class DiffTracker:
         if agg_func is not None:
             frame_log.agg = self._get_agg(df, agg_func, axis)
             frame_log.axis = axis
+        if copy:
+            frame_log.copy = df.copy()
 
         self.logs.append(value=frame_log, key=key)
         if return_result:

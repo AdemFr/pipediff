@@ -123,5 +123,11 @@ def test_slicing(df_num: pd.DataFrame) -> None:
     pd.testing.assert_frame_equal(result.agg, expected)
 
 
-# Access frame logs for index and columns differently with value.agg_indices and value.agg_columns
-# Slice copy (maybe with warnings for too large copy operations)
+def test_full_and_sliced_copy(tracker: DiffTracker, df_all_types: pd.DataFrame) -> None:
+    result = tracker.log_frame(df_all_types, copy=True, return_result=True)
+    pd.testing.assert_frame_equal(result.copy, df_all_types)
+
+    idx = list(df_all_types.index[:2])
+    cols = list(df_all_types.columns[4:7])
+    result = tracker.log_frame(df_all_types, indices=idx, columns=cols, copy=True, return_result=True)
+    pd.testing.assert_frame_equal(result.copy, df_all_types.loc[idx, cols])
