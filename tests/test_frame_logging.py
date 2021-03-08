@@ -135,5 +135,14 @@ def test_full_and_sliced_copy(tracker: DiffTracker, df_all_types: pd.DataFrame) 
 
 def test_log_dtypes(tracker: DiffTracker, df_all_types: pd.DataFrame) -> None:
     result = tracker.log_frame(df_all_types, dtypes=True, return_result=True)
-
     assert result.dtypes == dict(df_all_types.dtypes)
+
+
+def test_log_shapes(tracker: DiffTracker, df_all_types: pd.DataFrame) -> None:
+    result = tracker.log_frame(df_all_types, shape=True, return_result=True)
+    assert result.shape == df_all_types.shape
+
+
+def test_log_colums(tracker: DiffTracker, df_all_types: pd.DataFrame) -> None:
+    result = tracker.log_frame(df_all_types, column_names=True, return_result=True)
+    assert result.column_names == list(df_all_types.columns)

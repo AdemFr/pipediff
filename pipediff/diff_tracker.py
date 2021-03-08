@@ -1,6 +1,6 @@
 from collections import OrderedDict
 from functools import wraps
-from typing import Any, Union
+from typing import Any, Tuple, Union
 
 import pandas as pd
 
@@ -9,22 +9,30 @@ from pipediff.custom_agg_funcs import CustomAggFuncs
 
 class FrameLog:
     def __init__(
-        self, agg: pd.DataFrame = None, axis: int = None, dtypes: dict = None, copy: pd.DataFrame = None
+        self,
+        agg: pd.DataFrame = None,
+        axis: int = None,
+        dtypes: dict = None,
+        shape: Tuple[int, int] = None,
+        column_names: list = None,
+        copy: pd.DataFrame = None,
     ) -> None:
         """Init empty FrameLog"""
         self.agg = agg
         self.axis = axis
         self.dtypes = dtypes
+        self.shape = shape
+        self.column_names = column_names
         self.copy = copy
 
     def __eq__(self, o: object) -> bool:
-        """Checks classical equivalence for all non DataFrame object, and asserts that all DataFrames
+        """Checks classical equivalence for all non DataFrame objects, and asserts that all DataFrames
         are exactly the same.
         """
         if not isinstance(o, FrameLog):
             return False
         else:
-            for attr in ("agg", "axis", "copy"):
+            for attr in vars(self).keys():
                 a1, a2 = getattr(self, attr), getattr(o, attr)
                 if isinstance(a1, pd.DataFrame) and isinstance(a2, pd.DataFrame):
                     try:
@@ -34,6 +42,20 @@ class FrameLog:
                 elif a1 != a2:
                     return False
         return True
+
+    def __repr__(self) -> str:
+        """Create an easy to read representation of a FrameLog.
+
+        Example:
+            FrameLog(agg=DataFrame(...), axis=1, dtypes=None, shape=(10, 3), column_names=None, copy=None)
+        """
+        repr_str = []
+        for k, v in dict(vars(self)).items():
+            if isinstance(v, pd.DataFrame):
+                v = "DataFrame(...)"
+            repr_str.append(f"{k}={v}")
+
+        return f"FrameLog({', '.join(repr_str)})"
 
 
 class FrameLogCollection(OrderedDict):
@@ -68,7 +90,7 @@ class FrameLogCollection(OrderedDict):
             return super().__getitem__(k)
 
     def append(self, value: FrameLog, key: str = None) -> str:
-        """Append new entry. If key is not given a new one will be created."""
+        """Append new entry. If key is not given a new one will be created based on the internal assigment counter."""
         if key is not None and key in self:
             raise KeyError(f"Key '{key}' already exists!")
         elif key is None:
@@ -85,6 +107,8 @@ class DiffTracker:
         agg_func: Union[callable, str, list, dict] = None,
         axis: int = 0,
         dtypes: bool = None,
+        shape: bool = None,
+        column_names: bool = None,
         copy: bool = None,
     ) -> None:
         """Init with default values for all logging and tracking."""
@@ -93,6 +117,8 @@ class DiffTracker:
         self.agg_func = agg_func
         self.axis = axis
         self.dtypes = dtypes
+        self.shape = shape
+        self.column_names = column_names
         self.copy = copy
 
         self.logs = FrameLogCollection()
@@ -110,33 +136,36 @@ class DiffTracker:
         agg_func: Union[callable, str, list, dict] = None,
         axis: int = 0,
         dtypes: bool = None,
+        shape: bool = None,
+        column_names: bool = None,
         copy: bool = None,
         return_result: bool = None,
     ) -> None:
         """Append frame statistics to the frame_logs depending on the given arguments."""
 
-        if indices is None:
-            indices = self.indices
-        if columns is None:
-            columns = self.columns
-        if agg_func is None:
-            agg_func = self.agg_func
-        if axis is None:
-            axis = self.axis
-        if dtypes is None:
-            dtypes = self.dtypes
-        if copy is None:
-            copy = self.copy
+        indices = self.indices if indices is None else indices
+        columns = self.columns if columns is None else columns
+        agg_func = self.agg_func if agg_func is None else agg_func
+        axis = self.axis if axis is None else axis
+        dtypes = self.dtypes if dtypes is None else dtypes
+        shape = self.shape if shape is None else shape
+        column_names = self.column_names if column_names is None else column_names
+        copy = self.copy if copy is None else copy
 
         frame_log = FrameLog()
 
-        df = self._slice_df(df, indices, columns)
+        if indices is not None or columns is not None:
+            df = self._slice_df(df, indices, columns)
 
         if agg_func is not None:
             frame_log.agg = self._get_agg(df, agg_func, axis)
             frame_log.axis = axis
         if dtypes:
             frame_log.dtypes = dict(df.dtypes)
+        if shape:
+            frame_log.shape = df.shape
+        if column_names:
+            frame_log.column_names = list(df.columns)
         if copy:
             frame_log.copy = df.copy()
 
