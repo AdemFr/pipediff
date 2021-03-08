@@ -238,7 +238,7 @@ class DiffTracker:
                         f" Got {type(df_1)} instead."
                     )
                 else:
-                    self.log_frame(df_1)
+                    self.log_frame(df_1, key=f"{func.__name__}_#1")
 
                 out = func(*args, **kwargs)
 
@@ -251,7 +251,7 @@ class DiffTracker:
                         f" Got {type(df_2)} instead."
                     )
                 else:
-                    self.log_frame(df_2)
+                    self.log_frame(df_2, key=f"{func.__name__}_#2")
 
                 return out
 
