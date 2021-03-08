@@ -213,7 +213,7 @@ class DiffTracker:
                 out = func(*args, **kwargs)
 
                 # Unpacking the first return value in case we get a tuple
-                # We can't use implicit unpacking like df_2, *rest = func(..) becaue DataFrames can also be unpacked.
+                # We can't use implicit unpacking like df_2, *rest = func(..) because DataFrames can also be unpacked.
                 df_2 = out[0] if isinstance(out, tuple) else out
                 if not isinstance(df_2, pd.DataFrame):
                     raise TypeError(
