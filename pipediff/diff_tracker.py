@@ -45,15 +45,17 @@ class FrameLog:
 
     def __repr__(self) -> str:
         """Create an easy to read representation of a FrameLog.
+        None values will not be added, to make the representation shorter.
 
         Example:
-            FrameLog(agg=DataFrame(...), axis=1, dtypes=None, shape=(10, 3), column_names=None, copy=None)
+            FrameLog(agg=DataFrame(...), axis=1)
         """
         repr_str = []
         for k, v in dict(vars(self)).items():
-            if isinstance(v, pd.DataFrame):
-                v = "DataFrame(...)"
-            repr_str.append(f"{k}={v}")
+            if v is not None:
+                if isinstance(v, pd.DataFrame):
+                    v = "DataFrame(...)"
+                repr_str.append(f"{k}={v}")
 
         return f"FrameLog({', '.join(repr_str)})"
 
