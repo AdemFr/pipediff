@@ -8,13 +8,12 @@ from pipediff.custom_agg_funcs import CustomAggFuncs
 
 _NEW_LOG_KEY = "df_{}".format  # Call with _LOG_KEY(0)
 
-_CONCAT_LOG_KEY = "log_key"
+_LOG_KEY = "log_key"
 
-_CONCAT_AGG_FUNC_NAME = "agg_func"
-_CONCAT_AGG_COL_NAME = "col_name"
-
-_CONCAT_SHAPE_N_ROWS = "n_rows"
-_CONCAT_SHAPE_N_COLS = "n_cols"
+_AGG_FUNC_NAME = "agg_func"
+_COL_NAME = "col_name"
+_N_ROWS = "n_rows"
+_N_COLS = "n_cols"
 
 
 class FrameLog:
@@ -111,7 +110,10 @@ class FrameLogCollection(OrderedDict):
             self[key] = value
 
     def _get_attr_dict(self, attr: str) -> Dict[str, Any]:
-        return {k: getattr(v, attr) for k, v in self.items()}
+        attr_dict = OrderedDict()
+        for k, v in self.items():
+            attr_dict[k] = getattr(v, attr)
+        return attr_dict
 
     def agg(self, agg_func_first: bool = False) -> pd.DataFrame:
         """View agg values as a multi index DataFrame."""
@@ -119,15 +121,15 @@ class FrameLogCollection(OrderedDict):
         # Concat with "keys" will result in a multi index for the index
         agg_concat = pd.concat(agg_dict.values(), axis=0, keys=agg_dict.keys())
         # Rename indices
-        agg_concat.columns.name = _CONCAT_AGG_COL_NAME
-        agg_concat.index.names = (_CONCAT_LOG_KEY, _CONCAT_AGG_FUNC_NAME)
+        agg_concat.columns.name = _COL_NAME
+        agg_concat.index.names = (_LOG_KEY, _AGG_FUNC_NAME)
 
         if agg_func_first:
             agg_concat = agg_concat.swaplevel()
             # swaplevel() leaves the sorting of both index levels the same, so the new outer index is not grouped.
             # We need to group same keys, but do want the groups to be ordered by first occurrence, not alphabetically.
             # ["sum", "min", "sum", "min"] should become ["sum", "sum", "min", "min"] not ["min", "min", "sum", "sum"]
-            agg_func_names = agg_concat.index.get_level_values(_CONCAT_AGG_FUNC_NAME)
+            agg_func_names = agg_concat.index.get_level_values(_AGG_FUNC_NAME)
             ordered_index = pd.Index(pd.Categorical(agg_func_names, agg_func_names.unique(), ordered=True))
             # categories should be: Categories ['sum' < 'min'] so sorting will happen with regard to this ordering
             sorted_indexer = ordered_index.sort_values(return_indexer=True)[1]
@@ -140,8 +142,8 @@ class FrameLogCollection(OrderedDict):
         dtypes_dict = self._get_attr_dict("dtypes")
         df_dtypes = pd.DataFrame(dtypes_dict).T
 
-        df_dtypes.index.name = _CONCAT_LOG_KEY
-        df_dtypes.columns.name = _CONCAT_AGG_COL_NAME
+        df_dtypes.index.name = _LOG_KEY
+        df_dtypes.columns.name = _COL_NAME
 
         return df_dtypes
 
@@ -150,8 +152,8 @@ class FrameLogCollection(OrderedDict):
         shape_dict = self._get_attr_dict("shape")
         df_shape = pd.DataFrame(shape_dict).T
 
-        df_shape.index.name = _CONCAT_LOG_KEY
-        df_shape.columns = [_CONCAT_SHAPE_N_ROWS, _CONCAT_SHAPE_N_COLS]
+        df_shape.index.name = _LOG_KEY
+        df_shape.columns = [_N_ROWS, _N_COLS]
 
         return df_shape
 
