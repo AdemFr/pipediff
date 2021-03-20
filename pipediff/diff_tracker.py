@@ -2,12 +2,11 @@ from collections import OrderedDict
 from functools import wraps
 from typing import Any, Dict, Tuple, Union
 
-import numpy as np
 import pandas as pd
 
 from pipediff.custom_agg_funcs import CustomAggFuncs
 
-_LOG_KEY = "df_{}".format  # Call with _LOG_KEY(0)
+_NEW_LOG_KEY = "df_{}".format  # Call with _LOG_KEY(0)
 
 _CONCAT_COL_NAME = "col_name"
 _CONCAT_LOG_KEY = "log_key"
@@ -102,7 +101,7 @@ class FrameLogCollection(OrderedDict):
         if key is not None and key in self:
             raise KeyError(f"Key '{key}' already exists!")
         elif key is None:
-            self[_LOG_KEY(self._assignment_counter)] = value
+            self[_NEW_LOG_KEY(self._assignment_counter)] = value
         else:
             self[key] = value
 

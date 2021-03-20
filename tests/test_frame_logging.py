@@ -3,7 +3,7 @@ import pandas as pd
 import pytest
 
 from pipediff import DiffTracker
-from pipediff.diff_tracker import FrameLog, _LOG_KEY
+from pipediff.diff_tracker import FrameLog, _NEW_LOG_KEY
 
 
 def test_default_attributes(tracker: DiffTracker) -> None:
@@ -30,7 +30,7 @@ def test_log_multiple_frames(tracker: DiffTracker) -> None:
 
 def test_frame_log_access(tracker: DiffTracker, df_num: pd.DataFrame) -> None:
     result = tracker.log_frame(df_num, agg_func="sum", return_result=True)
-    key = _LOG_KEY(0)
+    key = _NEW_LOG_KEY(0)
     fl = tracker.logs
 
     assert len(fl) == 1
