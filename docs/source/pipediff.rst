@@ -1,29 +1,29 @@
-pipediff package
+pipetrack package
 ================
 
 Submodules
 ----------
 
-pipediff.custom\_agg\_funcs module
+pipetrack.custom\_agg\_funcs module
 ----------------------------------
 
-.. automodule:: pipediff.custom_agg_funcs
+.. automodule:: pipetrack.custom_agg_funcs
    :members:
    :undoc-members:
    :show-inheritance:
 
-pipediff.diff\_tracker module
+pipetrack.diff\_tracker module
 -----------------------------
 
-.. automodule:: pipediff.pipe_tracker
+.. automodule:: pipetrack.pipe_tracker
    :members:
    :undoc-members:
    :show-inheritance:
 
-pipediff.frame\_log module
+pipetrack.frame\_log module
 --------------------------
 
-.. automodule:: pipediff.frame_log
+.. automodule:: pipetrack.frame_log
    :members:
    :undoc-members:
    :show-inheritance:
@@ -31,7 +31,7 @@ pipediff.frame\_log module
 Module contents
 ---------------
 
-.. automodule:: pipediff
+.. automodule:: pipetrack
    :members:
    :undoc-members:
    :show-inheritance:

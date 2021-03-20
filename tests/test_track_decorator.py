@@ -1,8 +1,8 @@
-from pipediff.pipe_tracker import FrameLog
+from pipetrack.pipe_tracker import FrameLog
 import pandas as pd
 import pytest
 
-from pipediff import PipeTracker
+from pipetrack import PipeTracker
 
 
 def test_basic_tracking_decorator(tracker: PipeTracker, df_all_types: pd.DataFrame) -> None:

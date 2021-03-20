@@ -2,6 +2,6 @@
 Usage
 =====
 
-To use pipediff in a project::
+To use pipetrack in a project::
 
-    import pipediff
+    import pipetrack

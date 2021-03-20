@@ -1,12 +1,12 @@
 [tool.poetry]
-name = "pipediff"
+name = "pipetrack"
 version = "0.0.1"
 description = "A python packages to make functional pandas pipelines more transparent."
 authors = ["Adem Frenk <adem.frenk@gmail.com>"]
 license = "MIT"
 readme = "README.rst"
-repository = "https://github.com/ademfr/pipediff"
-documentation = "https://pipediff.readthedocs.io/"
+repository = "https://github.com/ademfr/pipetrack"
+documentation = "https://pipetrack.readthedocs.io/"
 classifiers=[
     "Development Status :: 2 - Pre-Alpha",
     "Intended Audience :: Developers",

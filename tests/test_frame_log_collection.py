@@ -1,8 +1,8 @@
 import numpy as np
 import pandas as pd
 
-from pipediff import PipeTracker
-from pipediff.frame_log import (
+from pipetrack import PipeTracker
+from pipetrack.frame_log import (
     _COL_NAME,
     _LOG_KEY,
     _AGG_FUNC_NAME,

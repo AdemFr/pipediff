@@ -1,4 +1,4 @@
-Welcome to pipediff's documentation!
+Welcome to pipetrack's documentation!
 ====================================
 
 .. toctree::

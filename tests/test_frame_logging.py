@@ -2,8 +2,8 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from pipediff import PipeTracker
-from pipediff.frame_log import FrameLog, _NEW_LOG_KEY
+from pipetrack import PipeTracker
+from pipetrack.frame_log import FrameLog, _NEW_LOG_KEY
 
 
 def test_default_attributes(tracker: PipeTracker) -> None:

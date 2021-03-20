@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 import pytest
 
-from pipediff import PipeTracker
+from pipetrack import PipeTracker
 
 
 @pytest.fixture

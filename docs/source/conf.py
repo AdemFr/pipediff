@@ -14,20 +14,20 @@ import os
 import sys
 
 sys.path.insert(0, os.path.abspath("../../"))
-import pipediff
+import pipetrack
 
 
 # -- Project information -----------------------------------------------------
 
-project = "pipediff"
+project = "pipetrack"
 copyright = "2020, Adem Frenk"
 author = "Adem Frenk"
 
 # The full version, including alpha/beta/rc tags
 # The short X.Y version.
-version = pipediff.__version__
+version = pipetrack.__version__
 # The full version, including alpha/beta/rc tags.
-release = pipediff.__version__
+release = pipetrack.__version__
 
 
 # -- General configuration ---------------------------------------------------

@@ -3,8 +3,8 @@ from typing import Any, Union
 
 import pandas as pd
 
-from pipediff.custom_agg_funcs import CustomAggFuncs
-from pipediff.frame_log import FrameLog, FrameLogCollection
+from pipetrack.custom_agg_funcs import CustomAggFuncs
+from pipetrack.frame_log import FrameLog, FrameLogCollection
 
 
 class PipeTracker:

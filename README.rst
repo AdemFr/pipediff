@@ -1,23 +1,23 @@
 ========
-pipediff
+pipetrack
 ========
 
 
-.. image:: https://img.shields.io/pypi/v/pipediff.svg
-        :target: https://pypi.python.org/pypi/pipediff
+.. image:: https://img.shields.io/pypi/v/pipetrack.svg
+        :target: https://pypi.python.org/pypi/pipetrack
 
-.. image:: https://img.shields.io/travis/ademfr/pipediff.svg
-        :target: https://travis-ci.com/ademfr/pipediff
+.. image:: https://img.shields.io/travis/ademfr/pipetrack.svg
+        :target: https://travis-ci.com/ademfr/pipetrack
 
-.. image:: https://readthedocs.org/projects/pipediff/badge/?version=latest
-        :target: https://pipediff.readthedocs.io/en/latest/?badge=latest
+.. image:: https://readthedocs.org/projects/pipetrack/badge/?version=latest
+        :target: https://pipetrack.readthedocs.io/en/latest/?badge=latest
         :alt: Documentation Status
 
 
-pipediff tries to make functional pandas pipelines more transparent.
+pipetrack tries to make functional pandas pipelines more transparent.
 
 * Free software: MIT license
-* Documentation: https://pipediff.readthedocs.io.
+* Documentation: https://pipetrack.readthedocs.io.
 
 
 Features

@@ -1,7 +1,7 @@
-pipediff
+pipetrack
 ========
 
 .. toctree::
    :maxdepth: 4
 
-   pipediff
+   pipetrack
