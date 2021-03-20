@@ -2,12 +2,12 @@ import pandas as pd
 import numpy as np
 import pytest
 
-from pipediff import DiffTracker
+from pipediff import PipeTracker
 
 
 @pytest.fixture
-def tracker() -> DiffTracker:
-    return DiffTracker()
+def tracker() -> PipeTracker:
+    return PipeTracker()
 
 
 @pytest.fixture

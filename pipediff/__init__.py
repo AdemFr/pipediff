@@ -1,5 +1,5 @@
 """Top-level package for pipediff."""
-from pipediff.diff_tracker import DiffTracker
+from pipediff.diff_tracker import PipeTracker
 
 __all__ = ("DiffTracker",)
 

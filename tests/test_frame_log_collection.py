@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 
-from pipediff import DiffTracker
+from pipediff import PipeTracker
 from pipediff.frame_log import (
     _COL_NAME,
     _LOG_KEY,
@@ -19,7 +19,7 @@ def test_frame_log_collection_agg(df_num: pd.DataFrame) -> None:
     # result config
 
     # logging
-    tracker = DiffTracker(agg_func=agg_func, columns=columns)
+    tracker = PipeTracker(agg_func=agg_func, columns=columns)
     tracker.log_frame(df_num, key="one")
     tracker.log_frame(df_num, key="two")
 
@@ -47,7 +47,7 @@ def test_frame_log_collection_agg(df_num: pd.DataFrame) -> None:
 
 
 def test_frame_log_collection_dtypes(df_num: pd.DataFrame) -> None:
-    tracker = DiffTracker(dtypes=True)
+    tracker = PipeTracker(dtypes=True)
 
     ftype = df_num["float"].dtype
     itype = df_num["int"].dtype
@@ -70,7 +70,7 @@ def test_frame_log_collection_dtypes(df_num: pd.DataFrame) -> None:
 
 
 def test_frame_log_collection_shape(df_all_types: pd.DataFrame) -> None:
-    tracker = DiffTracker(shape=True)
+    tracker = PipeTracker(shape=True)
 
     tracker.log_frame(df_all_types, key="one")
     df_all_types = df_all_types.iloc[:1, :3]
@@ -85,7 +85,7 @@ def test_frame_log_collection_shape(df_all_types: pd.DataFrame) -> None:
 
 
 def test_frame_log_collection_column_names(df_num: pd.DataFrame) -> None:
-    tracker = DiffTracker(column_names=True)
+    tracker = PipeTracker(column_names=True)
 
     tracker.log_frame(df_num, key="one")
     _df = df_num.loc[:, ["float", "int"]]

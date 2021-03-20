@@ -2,10 +2,10 @@ from pipediff.diff_tracker import FrameLog
 import pandas as pd
 import pytest
 
-from pipediff import DiffTracker
+from pipediff import PipeTracker
 
 
-def test_basic_tracking_decorator(tracker: DiffTracker, df_all_types: pd.DataFrame) -> None:
+def test_basic_tracking_decorator(tracker: PipeTracker, df_all_types: pd.DataFrame) -> None:
     def _func(df: pd.DataFrame) -> pd.DataFrame:
         return df
 
@@ -20,7 +20,7 @@ def test_basic_tracking_decorator(tracker: DiffTracker, df_all_types: pd.DataFra
     assert isinstance(tracker.logs[f"{_func.__name__}_#2"], FrameLog)
 
 
-def test_decorator_exceptions(tracker: DiffTracker, df_all_types: pd.DataFrame) -> None:
+def test_decorator_exceptions(tracker: PipeTracker, df_all_types: pd.DataFrame) -> None:
     @tracker.track()
     def _func_1(df: pd.DataFrame) -> pd.DataFrame:
         return df, 5

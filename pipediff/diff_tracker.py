@@ -7,7 +7,7 @@ from pipediff.custom_agg_funcs import CustomAggFuncs
 from pipediff.frame_log import FrameLog, FrameLogCollection
 
 
-class DiffTracker:
+class PipeTracker:
     def __init__(
         self,
         indices: list = None,
