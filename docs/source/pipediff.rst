@@ -15,7 +15,7 @@ pipediff.custom\_agg\_funcs module
 pipediff.diff\_tracker module
 -----------------------------
 
-.. automodule:: pipediff.diff_tracker
+.. automodule:: pipediff.pipe_tracker
    :members:
    :undoc-members:
    :show-inheritance:

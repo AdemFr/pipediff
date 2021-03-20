@@ -1,7 +1,7 @@
 """Top-level package for pipediff."""
-from pipediff.diff_tracker import PipeTracker
+from pipediff.pipe_tracker import PipeTracker
 
-__all__ = ("DiffTracker",)
+__all__ = ("PipeTracker",)
 
 __author__ = """Adem Frenk"""
 __email__ = "adem.frenk@gmail.com"

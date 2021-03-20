@@ -1,4 +1,4 @@
-from pipediff.diff_tracker import FrameLog
+from pipediff.pipe_tracker import FrameLog
 import pandas as pd
 import pytest
 
