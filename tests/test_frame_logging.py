@@ -3,7 +3,7 @@ import pandas as pd
 import pytest
 
 from pipediff import DiffTracker
-from pipediff.diff_tracker import FrameLog, _NEW_LOG_KEY
+from pipediff.frame_log import FrameLog, _NEW_LOG_KEY
 
 
 def test_default_attributes(tracker: DiffTracker) -> None:

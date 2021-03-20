@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 
 from pipediff import DiffTracker
-from pipediff.diff_tracker import (
+from pipediff.frame_log import (
     _COL_NAME,
     _LOG_KEY,
     _AGG_FUNC_NAME,
