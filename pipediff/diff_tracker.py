@@ -197,6 +197,14 @@ class DiffTracker:
 
         frame_log = FrameLog()
 
+        # We log present shape and columns_names before slicing, because returning those when
+        # indices and columns are provided already gives little information.
+        # Additionally this could give the wrong impression of a changing shape or number of columns.
+        if shape:
+            frame_log.shape = df.shape
+        if column_names:
+            frame_log.column_names = list(df.columns)
+
         if indices is not None or columns is not None:
             df = self._slice_df(df, indices, columns)
 

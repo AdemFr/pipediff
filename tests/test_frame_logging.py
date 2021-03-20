@@ -143,7 +143,19 @@ def test_log_shapes(tracker: DiffTracker, df_all_types: pd.DataFrame) -> None:
     result = tracker.log_frame(df_all_types, shape=True, return_result=True)
     assert result.shape == df_all_types.shape
 
+    # Check that the original shape and not the sliced one is returned, because this would give little information.
+    idx = df_all_types.index[:2]
+    cols = df_all_types.columns[:3]
+    result_2 = tracker.log_frame(df_all_types, shape=True, return_result=True, indices=idx, columns=cols)
+    assert result_2.shape == df_all_types.shape
+
 
 def test_log_colums(tracker: DiffTracker, df_all_types: pd.DataFrame) -> None:
     result = tracker.log_frame(df_all_types, column_names=True, return_result=True)
     assert result.column_names == list(df_all_types.columns)
+
+    # Check that the original columns and not the sliced ones are returned, because this would give little information.
+    idx = df_all_types.index[:2]
+    cols = df_all_types.columns[:3]
+    result_2 = tracker.log_frame(df_all_types, column_names=True, return_result=True, indices=idx, columns=cols)
+    assert result_2.column_names == list(df_all_types.columns)
