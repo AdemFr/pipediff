@@ -6,6 +6,8 @@ import pandas as pd
 
 from pipediff.custom_agg_funcs import CustomAggFuncs
 
+_LOG_KEY = "df_{}".format  # Call with _LOG_KEY(0)
+
 
 class FrameLog:
     def __init__(
@@ -96,7 +98,7 @@ class FrameLogCollection(OrderedDict):
         if key is not None and key in self:
             raise KeyError(f"Key '{key}' already exists!")
         elif key is None:
-            self[f"df_{self._assignment_counter}"] = value
+            self[_LOG_KEY(self._assignment_counter)] = value
         else:
             self[key] = value
 

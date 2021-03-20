@@ -3,7 +3,7 @@ import pandas as pd
 import pytest
 
 from pipediff import DiffTracker
-from pipediff.diff_tracker import FrameLog
+from pipediff.diff_tracker import FrameLog, _LOG_KEY
 
 
 def test_default_attributes(tracker: DiffTracker) -> None:
@@ -30,18 +30,19 @@ def test_log_multiple_frames(tracker: DiffTracker) -> None:
 
 def test_frame_log_access(tracker: DiffTracker, df_num: pd.DataFrame) -> None:
     result = tracker.log_frame(df_num, agg_func="sum", return_result=True)
+    key = _LOG_KEY(0)
     fl = tracker.logs
 
     assert len(fl) == 1
 
     # Same aggregation DataFrame values and ids
-    pd.testing.assert_frame_equal(result.agg, fl["df_0"].agg)
+    pd.testing.assert_frame_equal(result.agg, fl[key].agg)
     assert (
-        id(result.agg) == id(fl["df_0"].agg) == id(fl[0].agg) == id(fl[-1].agg)
+        id(result.agg) == id(fl[key].agg) == id(fl[0].agg) == id(fl[-1].agg)
     ), "Different access methods should yield the same result reference!"
 
     for fl_ in (fl[0:], fl[0:1], fl[0::1], fl[-1:]):
-        assert id(result.agg) == id(fl_["df_0"].agg), "Slice does not contain expected result reference!"
+        assert id(result.agg) == id(fl_[key].agg), "Slice does not contain expected result reference!"
 
 
 def test_log_frame_with_name(tracker: DiffTracker) -> None:
