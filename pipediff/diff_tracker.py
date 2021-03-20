@@ -8,8 +8,13 @@ from pipediff.custom_agg_funcs import CustomAggFuncs
 
 _NEW_LOG_KEY = "df_{}".format  # Call with _LOG_KEY(0)
 
-_CONCAT_COL_NAME = "col_name"
 _CONCAT_LOG_KEY = "log_key"
+
+_CONCAT_AGG_FUNC_NAME = "agg_func"
+_CONCAT_AGG_COL_NAME = "col_name"
+
+_CONCAT_SHAPE_N_ROWS = "n_rows"
+_CONCAT_SHAPE_N_COLS = "n_cols"
 
 
 class FrameLog:
@@ -108,21 +113,21 @@ class FrameLogCollection(OrderedDict):
     def _get_attr_dict(self, attr: str) -> Dict[str, Any]:
         return {k: getattr(v, attr) for k, v in self.items()}
 
-    def concat_agg(self, agg_func_first: bool = False) -> pd.DataFrame:
+    def agg(self, agg_func_first: bool = False) -> pd.DataFrame:
         """View agg values as a multi index DataFrame."""
         agg_dict = self._get_attr_dict("agg")
         # Concat with "keys" will result in a multi index for the index
         agg_concat = pd.concat(agg_dict.values(), axis=0, keys=agg_dict.keys())
         # Rename indices
-        agg_concat.columns.name = _CONCAT_COL_NAME
-        agg_concat.index.names = (_CONCAT_LOG_KEY, _CONCAT_AGG_NAME)
+        agg_concat.columns.name = _CONCAT_AGG_COL_NAME
+        agg_concat.index.names = (_CONCAT_LOG_KEY, _CONCAT_AGG_FUNC_NAME)
 
         if agg_func_first:
             agg_concat = agg_concat.swaplevel()
             # swaplevel() leaves the sorting of both index levels the same, so the new outer index is not grouped.
             # We need to group same keys, but do want the groups to be ordered by first occurrence, not alphabetically.
             # ["sum", "min", "sum", "min"] should become ["sum", "sum", "min", "min"] not ["min", "min", "sum", "sum"]
-            agg_func_names = agg_concat.index.get_level_values(_CONCAT_AGG_NAME)
+            agg_func_names = agg_concat.index.get_level_values(_CONCAT_AGG_FUNC_NAME)
             ordered_index = pd.Index(pd.Categorical(agg_func_names, agg_func_names.unique(), ordered=True))
             # categories should be: Categories ['sum' < 'min'] so sorting will happen with regard to this ordering
             sorted_indexer = ordered_index.sort_values(return_indexer=True)[1]
@@ -130,16 +135,25 @@ class FrameLogCollection(OrderedDict):
 
         return agg_concat
 
-    def concat_dtypes(self) -> pd.DataFrame:
+    def dtypes(self) -> pd.DataFrame:
         """View dtypes values as a DataFrame."""
         dtypes_dict = self._get_attr_dict("dtypes")
-        # Build DataFrame with columns names as the columns and the log keys as index
         df_dtypes = pd.DataFrame(dtypes_dict).T
 
         df_dtypes.index.name = _CONCAT_LOG_KEY
-        df_dtypes.columns.name = _CONCAT_COL_NAME
+        df_dtypes.columns.name = _CONCAT_AGG_COL_NAME
 
         return df_dtypes
+
+    def shape(self) -> pd.DataFrame:
+        """View shape values as a DataFrame."""
+        shape_dict = self._get_attr_dict("shape")
+        df_shape = pd.DataFrame(shape_dict).T
+
+        df_shape.index.name = _CONCAT_LOG_KEY
+        df_shape.columns = [_CONCAT_SHAPE_N_ROWS, _CONCAT_SHAPE_N_COLS]
+
+        return df_shape
 
 
 class DiffTracker:
@@ -214,10 +228,6 @@ class DiffTracker:
             frame_log.agg_axis = agg_axis
         if dtypes:
             frame_log.dtypes = dict(df.dtypes)
-        if shape:
-            frame_log.shape = df.shape
-        if column_names:
-            frame_log.column_names = list(df.columns)
         if copy:
             frame_log.copy = df.copy()
 

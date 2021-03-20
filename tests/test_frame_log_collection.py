@@ -2,10 +2,16 @@ import numpy as np
 import pandas as pd
 
 from pipediff import DiffTracker
-from pipediff.diff_tracker import _CONCAT_COL_NAME, _CONCAT_LOG_KEY, _CONCAT_AGG_NAME
+from pipediff.diff_tracker import (
+    _CONCAT_AGG_COL_NAME,
+    _CONCAT_LOG_KEY,
+    _CONCAT_AGG_FUNC_NAME,
+    _CONCAT_SHAPE_N_ROWS,
+    _CONCAT_SHAPE_N_COLS,
+)
 
 
-def test_frame_log_collection_concat_agg(df_num: pd.DataFrame) -> None:
+def test_frame_log_collection_agg(df_num: pd.DataFrame) -> None:
     # tracking config
     agg_func = ["min", "max"]
     columns = ["float"]
@@ -18,29 +24,29 @@ def test_frame_log_collection_concat_agg(df_num: pd.DataFrame) -> None:
     tracker.log_frame(df_num, key="two")
 
     # Default format
-    result = tracker.logs.concat_agg()
+    result = tracker.logs.agg()
 
     expected_idx = [["one", "one", "two", "two"], ["min", "max", "min", "max"]]
-    expected_idx_names = [_CONCAT_LOG_KEY, _CONCAT_AGG_NAME]
+    expected_idx_names = [_CONCAT_LOG_KEY, _CONCAT_AGG_FUNC_NAME]
     col_multi_idx = pd.MultiIndex.from_arrays(arrays=expected_idx, names=expected_idx_names)
     expected = pd.DataFrame([1.0, 3.0, 1.0, 3.0], index=col_multi_idx, columns=columns)
-    expected.columns.name = _CONCAT_COL_NAME
+    expected.columns.name = _CONCAT_AGG_COL_NAME
 
     pd.testing.assert_frame_equal(result, expected)
 
     # Columns first
-    result_2 = tracker.logs.concat_agg(agg_func_first=True)
+    result_2 = tracker.logs.agg(agg_func_first=True)
 
     expected_idx = [["min", "min", "max", "max"], ["one", "two", "one", "two"]]
-    expected_idx_names = [_CONCAT_AGG_NAME, _CONCAT_LOG_KEY]
+    expected_idx_names = [_CONCAT_AGG_FUNC_NAME, _CONCAT_LOG_KEY]
     col_multi_idx = pd.MultiIndex.from_arrays(arrays=expected_idx, names=expected_idx_names)
     expected_2 = pd.DataFrame([1.0, 1.0, 3.0, 3.0], index=col_multi_idx, columns=columns)
-    expected_2.columns.name = _CONCAT_COL_NAME
+    expected_2.columns.name = _CONCAT_AGG_COL_NAME
 
     pd.testing.assert_frame_equal(result_2, expected_2)
 
 
-def test_frame_log_collection_concat_dtypes(df_num: pd.DataFrame) -> None:
+def test_frame_log_collection_dtypes(df_num: pd.DataFrame) -> None:
     tracker = DiffTracker(dtypes=True)
 
     ftype = df_num["float"].dtype
@@ -51,13 +57,28 @@ def test_frame_log_collection_concat_dtypes(df_num: pd.DataFrame) -> None:
     df_num["int"] = df_num["int"].astype(np.float64)
     tracker.log_frame(df_num, key="two")
 
-    result = tracker.logs.concat_dtypes()
+    result = tracker.logs.dtypes()
 
     # Note the changed dtype in "int"
     expected = pd.DataFrame(
         {"float": [ftype, ftype], "int": [itype, ftype], "int_pd": [itype_pd, itype_pd]}, index=["one", "two"]
     )
     expected.index.name = _CONCAT_LOG_KEY
-    expected.columns.name = _CONCAT_COL_NAME
+    expected.columns.name = _CONCAT_AGG_COL_NAME
+
+    pd.testing.assert_frame_equal(result, expected)
+
+
+def test_frame_log_collection_shape(df_all_types: pd.DataFrame) -> None:
+    tracker = DiffTracker(shape=True)
+
+    tracker.log_frame(df_all_types, key="one")
+    df_all_types = df_all_types.iloc[:1, :3]
+    tracker.log_frame(df_all_types, key="two")
+
+    result = tracker.logs.shape()
+
+    expected = pd.DataFrame({_CONCAT_SHAPE_N_ROWS: [3, 1], _CONCAT_SHAPE_N_COLS: [17, 3]}, index=["one", "two"])
+    expected.index.name = _CONCAT_LOG_KEY
 
     pd.testing.assert_frame_equal(result, expected)
