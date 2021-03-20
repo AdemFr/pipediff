@@ -2,13 +2,13 @@ import numpy as np
 import pandas as pd
 
 from pipediff import DiffTracker
-from pipediff.diff_tracker import _CONCAT_COL_NAME, _CONCAT_LOG_KEY
+from pipediff.diff_tracker import _CONCAT_COL_NAME, _CONCAT_LOG_KEY, _CONCAT_AGG_NAME
 
 
 def test_frame_log_collection_concat_agg(df_num: pd.DataFrame) -> None:
     # tracking config
-    agg_func = ["min"]
-    columns = ["float", "int"]
+    agg_func = ["min", "max"]
+    columns = ["float"]
 
     # result config
 
@@ -20,20 +20,22 @@ def test_frame_log_collection_concat_agg(df_num: pd.DataFrame) -> None:
     # Default format
     result = tracker.logs.concat_agg()
 
-    expected_col = [["one", "one", "two", "two"], ["float", "int", "float", "int"]]
-    expected_col_names = [_CONCAT_LOG_KEY, _CONCAT_COL_NAME]
-    col_multi_idx = pd.MultiIndex.from_arrays(arrays=expected_col, names=expected_col_names)
-    expected = pd.DataFrame([[1.0, 1, 1.0, 1]], index=agg_func, columns=col_multi_idx)
+    expected_idx = [["one", "one", "two", "two"], ["min", "max", "min", "max"]]
+    expected_idx_names = [_CONCAT_LOG_KEY, _CONCAT_AGG_NAME]
+    col_multi_idx = pd.MultiIndex.from_arrays(arrays=expected_idx, names=expected_idx_names)
+    expected = pd.DataFrame([1.0, 3.0, 1.0, 3.0], index=col_multi_idx, columns=columns)
+    expected.columns.name = _CONCAT_COL_NAME
 
     pd.testing.assert_frame_equal(result, expected)
 
     # Columns first
-    result_2 = tracker.logs.concat_agg(columns_first=True)
+    result_2 = tracker.logs.concat_agg(agg_func_first=True)
 
-    expected_col = [["float", "float", "int", "int"], ["one", "two", "one", "two"]]
-    expected_col_names = [_CONCAT_COL_NAME, _CONCAT_LOG_KEY]
-    col_multi_idx = pd.MultiIndex.from_arrays(arrays=expected_col, names=expected_col_names)
-    expected_2 = pd.DataFrame([[1.0, 1.0, 1, 1]], index=agg_func, columns=col_multi_idx)
+    expected_idx = [["min", "min", "max", "max"], ["one", "two", "one", "two"]]
+    expected_idx_names = [_CONCAT_AGG_NAME, _CONCAT_LOG_KEY]
+    col_multi_idx = pd.MultiIndex.from_arrays(arrays=expected_idx, names=expected_idx_names)
+    expected_2 = pd.DataFrame([1.0, 1.0, 3.0, 3.0], index=col_multi_idx, columns=columns)
+    expected_2.columns.name = _CONCAT_COL_NAME
 
     pd.testing.assert_frame_equal(result_2, expected_2)
 

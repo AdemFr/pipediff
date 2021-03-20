@@ -108,13 +108,25 @@ class FrameLogCollection(OrderedDict):
     def _get_attr_dict(self, attr: str) -> Dict[str, Any]:
         return {k: getattr(v, attr) for k, v in self.items()}
 
-    def concat_agg(self, columns_first: bool = False) -> pd.DataFrame:
+    def concat_agg(self, agg_func_first: bool = False) -> pd.DataFrame:
         """View agg values as a multi index DataFrame."""
         agg_dict = self._get_attr_dict("agg")
-        agg_concat = pd.concat(agg_dict.values(), axis=1, keys=agg_dict.keys())
-        agg_concat.columns.names = (_CONCAT_LOG_KEY, _CONCAT_COL_NAME)
-        if columns_first:
-            agg_concat = agg_concat.swaplevel(axis=1).sort_index(axis=1)
+        # Concat with "keys" will result in a multi index for the index
+        agg_concat = pd.concat(agg_dict.values(), axis=0, keys=agg_dict.keys())
+        # Rename indices
+        agg_concat.columns.name = _CONCAT_COL_NAME
+        agg_concat.index.names = (_CONCAT_LOG_KEY, _CONCAT_AGG_NAME)
+
+        if agg_func_first:
+            agg_concat = agg_concat.swaplevel()
+            # swaplevel() leaves the sorting of both index levels the same, so the new outer index is not grouped.
+            # We need to group same keys, but do want the groups to be ordered by first occurrence, not alphabetically.
+            # ["sum", "min", "sum", "min"] should become ["sum", "sum", "min", "min"] not ["min", "min", "sum", "sum"]
+            agg_func_names = agg_concat.index.get_level_values(_CONCAT_AGG_NAME)
+            ordered_index = pd.Index(pd.Categorical(agg_func_names, agg_func_names.unique(), ordered=True))
+            # categories should be: Categories ['sum' < 'min'] so sorting will happen with regard to this ordering
+            sorted_indexer = ordered_index.sort_values(return_indexer=True)[1]
+            agg_concat = agg_concat.iloc[sorted_indexer]  # Will return copy not view
 
         return agg_concat
 
