@@ -82,3 +82,23 @@ def test_frame_log_collection_shape(df_all_types: pd.DataFrame) -> None:
     expected.index.name = _LOG_KEY
 
     pd.testing.assert_frame_equal(result, expected)
+
+
+def test_frame_log_collection_column_names(df_num: pd.DataFrame) -> None:
+    tracker = DiffTracker(column_names=True)
+
+    tracker.log_frame(df_num, key="one")
+    _df = df_num.loc[:, ["float", "int"]]
+    _df["new_col"] = None
+    tracker.log_frame(_df, key="two")
+
+    result = tracker.logs.column_names()
+
+    expected = pd.DataFrame(
+        {"float": [True, True], "int": [True, True], "int_pd": [True, False], "new_col": [False, True]},
+        index=["one", "two"],
+    )
+    expected.index.name = _LOG_KEY
+    expected.columns.name = _COL_NAME
+
+    pd.testing.assert_frame_equal(result, expected)

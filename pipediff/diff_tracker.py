@@ -157,6 +157,24 @@ class FrameLogCollection(OrderedDict):
 
         return df_shape
 
+    def column_names(self) -> pd.DataFrame:
+        """View shape values as a DataFrame."""
+        columns_names_dict = self._get_attr_dict("column_names")
+        cols = OrderedDict()
+        for v in columns_names_dict.values():
+            cols.update(OrderedDict.fromkeys(v))
+
+        df_cols = pd.DataFrame(columns=cols, dtype=bool)
+
+        for k, v in columns_names_dict.items():
+            bool_mask = pd.Series(df_cols.columns.isin(v), index=df_cols.columns, name=k)
+            df_cols = df_cols.append(bool_mask)
+
+        df_cols.columns.name = _COL_NAME
+        df_cols.index.name = _LOG_KEY
+
+        return df_cols
+
 
 class DiffTracker:
     def __init__(
