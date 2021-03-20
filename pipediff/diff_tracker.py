@@ -1,6 +1,6 @@
 from collections import OrderedDict
 from functools import wraps
-from typing import Any, Tuple, Union
+from typing import Any, Dict, Tuple, Union
 
 import pandas as pd
 
@@ -101,6 +101,19 @@ class FrameLogCollection(OrderedDict):
             self[_LOG_KEY(self._assignment_counter)] = value
         else:
             self[key] = value
+
+    def _get_attr_dict(self, attr: str) -> Dict[str, Any]:
+        return {k: getattr(v, attr) for k, v in self.items()}
+
+    def concat_agg(self, columns_first: bool = False) -> pd.DataFrame:
+        """View agg values as a multi index DataFrame."""
+        agg_dict = self._get_attr_dict("agg")
+        agg_concat = pd.concat(agg_dict.values(), axis=1, keys=agg_dict.keys())
+        agg_concat.columns.names = ("log_key", "col_name")
+        if columns_first:
+            agg_concat = agg_concat.swaplevel(axis=1).sort_index(axis=1)
+
+        return agg_concat
 
 
 class DiffTracker:
