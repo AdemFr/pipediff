@@ -11,7 +11,7 @@ class FrameLog:
     def __init__(
         self,
         agg: pd.DataFrame = None,
-        axis: int = None,
+        agg_axis: int = None,
         dtypes: dict = None,
         shape: Tuple[int, int] = None,
         column_names: list = None,
@@ -19,7 +19,7 @@ class FrameLog:
     ) -> None:
         """Init empty FrameLog"""
         self.agg = agg
-        self.axis = axis
+        self.agg_axis = agg_axis
         self.dtypes = dtypes
         self.shape = shape
         self.column_names = column_names
@@ -117,7 +117,7 @@ class DiffTracker:
         self.indices = indices
         self.columns = columns
         self.agg_func = agg_func
-        self.axis = axis
+        self.agg_axis = axis
         self.dtypes = dtypes
         self.shape = shape
         self.column_names = column_names
@@ -136,7 +136,7 @@ class DiffTracker:
         indices: list = None,
         columns: list = None,
         agg_func: Union[callable, str, list, dict] = None,
-        axis: int = 0,
+        agg_axis: int = 0,
         dtypes: bool = None,
         shape: bool = None,
         column_names: bool = None,
@@ -148,7 +148,7 @@ class DiffTracker:
         indices = self.indices if indices is None else indices
         columns = self.columns if columns is None else columns
         agg_func = self.agg_func if agg_func is None else agg_func
-        axis = self.axis if axis is None else axis
+        agg_axis = self.agg_axis if agg_axis is None else agg_axis
         dtypes = self.dtypes if dtypes is None else dtypes
         shape = self.shape if shape is None else shape
         column_names = self.column_names if column_names is None else column_names
@@ -161,8 +161,8 @@ class DiffTracker:
 
         if agg_func is not None:
             func_list = self._parse_agg_func(agg_func)
-            frame_log.agg = df.agg(func=func_list, axis=axis)
-            frame_log.axis = axis
+            frame_log.agg = df.agg(func=func_list, axis=agg_axis)
+            frame_log.agg_axis = agg_axis
         if dtypes:
             frame_log.dtypes = dict(df.dtypes)
         if shape:

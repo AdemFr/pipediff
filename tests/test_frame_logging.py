@@ -91,7 +91,7 @@ def test_nans_and_agg_for_both_axis(tracker: DiffTracker, df_num: pd.DataFrame) 
     )
     pd.testing.assert_frame_equal(result.agg, expected)
 
-    result = tracker.log_frame(df_num, agg_func=agg_func, axis=1, return_result=True)
+    result = tracker.log_frame(df_num, agg_func=agg_func, agg_axis=1, return_result=True)
     expected = pd.DataFrame(
         data=[[0.0, 3.0, 3.0, 1.0, 1.0], [0.0, 3.0, 6.0, 2.0, 2.0], [0.0, 3.0, 9.0, 3.0, 3.0]],
         columns=agg_func,
