@@ -4,34 +4,26 @@ pipediff package
 Submodules
 ----------
 
-pipediff.column\_diff module
-----------------------------
+pipediff.custom\_agg\_funcs module
+----------------------------------
 
-.. automodule:: pipediff.column_diff
+.. automodule:: pipediff.custom_agg_funcs
    :members:
    :undoc-members:
    :show-inheritance:
 
-pipediff.frame\_diff module
----------------------------
+pipediff.diff\_tracker module
+-----------------------------
 
-.. automodule:: pipediff.frame_diff
+.. automodule:: pipediff.diff_tracker
    :members:
    :undoc-members:
    :show-inheritance:
 
-pipediff.index\_diff module
----------------------------
+pipediff.frame\_log module
+--------------------------
 
-.. automodule:: pipediff.index_diff
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-pipediff.track module
----------------------
-
-.. automodule:: pipediff.track
+.. automodule:: pipediff.frame_log
    :members:
    :undoc-members:
    :show-inheritance:
