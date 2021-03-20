@@ -2,11 +2,15 @@ from collections import OrderedDict
 from functools import wraps
 from typing import Any, Dict, Tuple, Union
 
+import numpy as np
 import pandas as pd
 
 from pipediff.custom_agg_funcs import CustomAggFuncs
 
 _LOG_KEY = "df_{}".format  # Call with _LOG_KEY(0)
+
+_CONCAT_COL_NAME = "col_name"
+_CONCAT_LOG_KEY = "log_key"
 
 
 class FrameLog:
@@ -109,11 +113,22 @@ class FrameLogCollection(OrderedDict):
         """View agg values as a multi index DataFrame."""
         agg_dict = self._get_attr_dict("agg")
         agg_concat = pd.concat(agg_dict.values(), axis=1, keys=agg_dict.keys())
-        agg_concat.columns.names = ("log_key", "col_name")
+        agg_concat.columns.names = (_CONCAT_LOG_KEY, _CONCAT_COL_NAME)
         if columns_first:
             agg_concat = agg_concat.swaplevel(axis=1).sort_index(axis=1)
 
         return agg_concat
+
+    def concat_dtypes(self) -> pd.DataFrame:
+        """View dtypes values as a DataFrame."""
+        dtypes_dict = self._get_attr_dict("dtypes")
+        # Build DataFrame with columns names as the columns and the log keys as index
+        df_dtypes = pd.DataFrame(dtypes_dict).T
+
+        df_dtypes.index.name = _CONCAT_LOG_KEY
+        df_dtypes.columns.name = _CONCAT_COL_NAME
+
+        return df_dtypes
 
 
 class DiffTracker:
