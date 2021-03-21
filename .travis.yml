@@ -13,6 +13,7 @@ script: tox
 
 before_deploy: pip install poetry
 deploy:
+  skip_cleanup: true
   provider: script
   script: poetry publish -r https://test.pypi.org/legacy/ -v --build
   on:
