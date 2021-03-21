@@ -1,5 +1,5 @@
 Welcome to pipetrack's documentation!
-====================================
+=====================================
 
 .. toctree::
    :maxdepth: 2
