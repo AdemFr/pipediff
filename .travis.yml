@@ -6,13 +6,12 @@ python:
   - 3.6.11
 
 before_install: python -m pip install --upgrade pip
-install: pip install tox-travis
+install: pip install tox-travis poetry
 
 # Command to run tests
 script: tox
 
 before_deploy:
-  - pip install poetry
   - poetry config repositories.testpypi https://test.pypi.org/legacy/
   - poetry config http-basic.pypi "__token__" "${POETRY_HTTP_BASIC_TESTPYPI_PASSWORD}"
 
