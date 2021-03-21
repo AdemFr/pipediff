@@ -10,7 +10,7 @@ PipeLog
         :target: https://travis-ci.com/ademfr/pipelog
 
 .. image:: https://img.shields.io/readthedocs/pipelog?style=flat-square
-        :target: https://pipelog.readthedocs.io/en/latest/?badge=latest
+        :target: https://pipelog.readthedocs.io/
         :alt: Documentation Status
 
 
