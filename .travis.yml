@@ -6,19 +6,17 @@ python:
   - 3.6.11
 
 before_install: python -m pip install --upgrade pip
-install: pip install -U tox-travis
+install: pip install tox-travis
 
 # Command to run tests
 script: tox
 
-# TODO $ travis encrypt --add deploy.password
+before_deploy: pip install poetry
 deploy:
-  provider: pypi
-  distributions: sdist bdist_wheel
-  user: ademfr
-  password:
-    secure: PLEASE_REPLACE_ME
+  provider: script
+  script: poetry publish -r https://test.pypi.org/legacy/ -v --build
   on:
     tags: true
     repo: ademfr/pipelog
     python: 3.7
+    branch: master
