@@ -1,19 +1,21 @@
-Welcome to pipetrack's documentation!
-=====================================
+.. include:: ../../README.rst
 
 .. toctree::
-   :maxdepth: 2
-   :caption: Contents:
+    :hidden:
+    :maxdepth: 2
+    :caption: Usage
+    
+    installation
+    quickstart
+    modules
+    
+    
+.. toctree::
+    :hidden:
+    :maxdepth: 2
+    :caption: Development
 
-   installation
-   usage
-   contributing
-   modules
-   history
-
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
+    contributing
+    history
+    license
+    GitHub Repository <https://github.com/ademfr/pipetrack>
