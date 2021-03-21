@@ -31,16 +31,17 @@ flake8-docstrings = { version = "^1.5.0", optional = true }
 black = { version = "^20.8b1", optional = true }
 bump2version = { version = "^1.0.1", optional = true }
 tox = { version = "^3.21.0", optional = true }
-furo = { version = "^2021.3.20-beta.31", optional = true }
-sphinx-copybutton = { version = "^0.3.1", optional = true }
+sphinx-autobuild = { version = "^2021.3.14", optional = true }
 # docs extras (see below)
 Sphinx = { version = "^3.4.3", optional = true }
+furo = { version = "^2021.3.20-beta.31", optional = true }
+sphinx-copybutton = { version = "^0.3.1", optional = true }
 # test extras (see below)
 pytest = { version = "^6.2.1", optional = true }
 coverage = { version = "^5.5", optional = true }
 
 [tool.poetry.extras]
-dev = ["flake8", "flake8-annotations", "flake8-docstrings", "black", "bump2version", "tox"]
+dev = ["flake8", "flake8-annotations", "flake8-docstrings", "black", "bump2version", "tox", "sphinx-autobuild"]
 docs = ["Sphinx", "furo", "sphinx-copybutton"]
 test = ["pytest", "coverage"]
 
