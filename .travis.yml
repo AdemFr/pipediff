@@ -14,7 +14,7 @@ script: tox
 before_deploy:
   - pip install poetry
   - poetry config repositories.testpypi https://test.pypi.org/legacy/
-  - poetry config pypi-token.testpypi $POETRY_PYPI_TOKEN_TESTPYPI
+  - poetry config poetry config http-basic.pypi "__token__" "${POETRY_PYPI_TOKEN_TESTPYPI}"
 deploy:
   skip_cleanup: true
   provider: script
