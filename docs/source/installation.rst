@@ -8,13 +8,13 @@ Installation
 Stable release
 --------------
 
-To install pipetrack, run this command in your terminal:
+To install pipelog, run this command in your terminal:
 
 .. code-block:: console
 
-    $ pip install pipetrack
+    $ pip install pipelog
 
-This is the preferred method to install pipetrack, as it will always install the most recent stable release.
+This is the preferred method to install pipelog, as it will always install the most recent stable release.
 
 If you don't have `pip`_ installed, this `Python installation guide`_ can guide
 you through the process.
@@ -26,19 +26,19 @@ you through the process.
 From sources
 ------------
 
-The sources for pipetrack can be downloaded from the `Github repo`_.
+The sources for pipelog can be downloaded from the `Github repo`_.
 
 You can either clone the public repository:
 
 .. code-block:: console
 
-    $ git clone git://github.com/ademfr/pipetrack
+    $ git clone git://github.com/ademfr/pipelog
 
 Or download the `tarball`_:
 
 .. code-block:: console
 
-    $ curl -OJL https://github.com/ademfr/pipetrack/tarball/master
+    $ curl -OJL https://github.com/ademfr/pipelog/tarball/master
 
 Once you have a copy of the source, you can install it with:
 
@@ -47,5 +47,5 @@ Once you have a copy of the source, you can install it with:
     $ python setup.py install
 
 
-.. _Github repo: https://github.com/ademfr/pipetrack
-.. _tarball: https://github.com/ademfr/pipetrack/tarball/master
+.. _Github repo: https://github.com/ademfr/pipelog
+.. _tarball: https://github.com/ademfr/pipelog/tarball/master

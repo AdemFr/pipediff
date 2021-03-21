@@ -1,20 +1,20 @@
 =========
-Pipetrack
+PipeLog
 =========
 
 
-.. image:: https://img.shields.io/pypi/v/pipetrack?style=flat-square
-        :target: https://pypi.python.org/pypi/pipetrack
+.. image:: https://img.shields.io/pypi/v/pipelog?style=flat-square
+        :target: https://pypi.python.org/pypi/pipelog
 
-.. image:: https://img.shields.io/travis/com/ademfr/pipetrack?style=flat-square
-        :target: https://travis-ci.com/ademfr/pipetrack
+.. image:: https://img.shields.io/travis/com/ademfr/pipelog?style=flat-square
+        :target: https://travis-ci.com/ademfr/pipelog
 
-.. image:: https://img.shields.io/readthedocs/pipetrack?style=flat-square
-        :target: https://pipetrack.readthedocs.io/en/latest/?badge=latest
+.. image:: https://img.shields.io/readthedocs/pipelog?style=flat-square
+        :target: https://pipelog.readthedocs.io/en/latest/?badge=latest
         :alt: Documentation Status
 
 
-pipetrack tries to make functional pandas pipelines more transparent.
+pipelog tries to make functional pandas pipelines more transparent.
 
 
 Features

@@ -18,4 +18,4 @@
     contributing
     history
     license
-    GitHub Repository <https://github.com/ademfr/pipetrack>
+    GitHub Repository <https://github.com/ademfr/pipelog>

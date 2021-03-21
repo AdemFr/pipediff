@@ -1,4 +1,4 @@
-* pipetrack version:
+* pipelog version:
 * Python version:
 * Operating System:
 

@@ -2,12 +2,12 @@ import pandas as pd
 import numpy as np
 import pytest
 
-from pipetrack import PipeTracker
+from pipelog import PipeLogger
 
 
 @pytest.fixture
-def tracker() -> PipeTracker:
-    return PipeTracker()
+def tracker() -> PipeLogger:
+    return PipeLogger()
 
 
 @pytest.fixture

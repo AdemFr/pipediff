@@ -20,5 +20,5 @@ deploy:
     secure: PLEASE_REPLACE_ME
   on:
     tags: true
-    repo: ademfr/pipetrack
+    repo: ademfr/pipelog
     python: 3.7

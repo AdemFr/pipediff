@@ -2,6 +2,6 @@
 Quickstart
 ==========
 
-To use pipetrack in a project::
+To use pipelog in a project::
 
-    import pipetrack
+    import pipelog

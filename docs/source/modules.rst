@@ -1,7 +1,7 @@
-pipetrack
-=========
+pipelog
+=======
 
 .. toctree::
    :maxdepth: 4
 
-   pipetrack
+   pipelog

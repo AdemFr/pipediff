@@ -1,1 +1,1 @@
-"""Unit test package for pipetrack."""
+"""Unit test package for pipelog."""

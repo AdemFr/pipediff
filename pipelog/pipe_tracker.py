@@ -3,11 +3,11 @@ from typing import Any, Union
 
 import pandas as pd
 
-from pipetrack.custom_agg_funcs import CustomAggFuncs
-from pipetrack.frame_log import FrameLog, FrameLogCollection
+from pipelog.custom_agg_funcs import CustomAggFuncs
+from pipelog.frame_log import FrameLog, FrameLogCollection
 
 
-class PipeTracker:
+class PipeLogger:
     def __init__(
         self,
         indices: list = None,

@@ -48,18 +48,18 @@ clean-test: ## remove test and coverage artifacts
 	rm -fr .pytest_cache
 
 lint: ## check style with flake8
-	flake8 pipetrack tests
+	flake8 pipelog tests
 
 coverage: ## check code coverage quickly with the default Python
-	coverage run --source pipetrack -m pytest
+	coverage run --source pipelog -m pytest
 	coverage report -m
 	coverage html
 	$(BROWSER) htmlcov/index.html
 
 docs: ## generate Sphinx HTML documentation, including API docs
-	rm -f docs/source/pipetrack.rst
+	rm -f docs/source/pipelog.rst
 	rm -f docs/source/modules.rst
-	sphinx-apidoc -o docs/source/ pipetrack
+	sphinx-apidoc -o docs/source/ pipelog
 	$(MAKE) -C docs clean
 	$(MAKE) -C docs html
 	$(BROWSER) docs/build/html/index.html
