@@ -8,8 +8,8 @@
     installation
     quickstart
     modules
-    
-    
+
+
 .. toctree::
     :hidden:
     :maxdepth: 2
