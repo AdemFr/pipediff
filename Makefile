@@ -50,12 +50,6 @@ clean-test: ## remove test and coverage artifacts
 lint: ## check style with flake8
 	flake8 pipetrack tests
 
-test: ## run tests quickly with the default Python
-	pytest
-
-test-all: ## run tests on every Python version with tox
-	tox
-
 coverage: ## check code coverage quickly with the default Python
 	coverage run --source pipetrack -m pytest
 	coverage report -m
