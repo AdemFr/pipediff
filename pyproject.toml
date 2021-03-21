@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pipelog"
-version = "0.0.1"
+version = "0.0.2"
 description = "A python packages to make functional pandas pipelines more transparent."
 authors = ["Adem Frenk <adem.frenk@gmail.com>"]
 license = "MIT"
