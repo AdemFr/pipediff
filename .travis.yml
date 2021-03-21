@@ -11,14 +11,15 @@ install: pip install tox-travis
 # Command to run tests
 script: tox
 
-before_deploy: pip install poetry
+before_deploy:
+  - pip install poetry
+  - poetry config repositories.testpypi https://test.pypi.org/legacy/
+  - poetry config http-basic.pypi "__token__" "${POETRY_HTTP_BASIC_TESTPYPI_PASSWORD}"
+
 deploy:
   skip_cleanup: true
   provider: script
-  script:
-    - poetry config repositories.testpypi https://test.pypi.org/legacy/
-    - poetry config http-basic.pypi "__token__" "${POETRY_HTTP_BASIC_TESTPYPI_PASSWORD}"
-    - poetry publish -r testpypi --build
+  script: poetry publish -r testpypi --build
   on:
     tags: true
     repo: AdemFr/pipelog
