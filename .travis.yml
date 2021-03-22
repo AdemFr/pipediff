@@ -19,7 +19,7 @@ before_deploy:
 deploy:
   skip_cleanup: true
   provider: script
-  script: poetry publish -r testpypi -u __token__ -p ${POETRY_HTTP_BASIC_TESTPYPI_PASSWORD} --build
+  script: poetry publish -r testpypi -u __token__ -p ${TESTPYPI_TOKEN} --build
   on:
     tags: true
     repo: AdemFr/pipelog
